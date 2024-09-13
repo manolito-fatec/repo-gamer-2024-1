@@ -25,6 +25,9 @@ jobs:
         cache: maven
 
     - name: Build with Maven
+      env:
+        DB_USERNAME: ${{ secrets.DB_USERNAME }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       run: mvn -B clean package --file pom.xml
 
   test:
@@ -42,4 +45,7 @@ jobs:
         cache: maven
 
     - name: Run tests with Maven
+      env:
+        DB_USERNAME: ${{ secrets.DB_USERNAME }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       run: mvn -B test --file pom.xml
