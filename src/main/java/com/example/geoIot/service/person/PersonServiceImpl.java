@@ -71,7 +71,7 @@ public class PersonServiceImpl  implements  PersonService{
     }
 
     private void personAlreadyExists(Person pPerson){
-        Optional<Person> personExists = personRepository.findById(pPerson.getIdPerson());
+        Optional<Person> personExists = personRepository.findByIdText(pPerson.getIdText());
         if (personExists.isPresent()) {
             throw new PersonAlreadyExistsException();
         }
