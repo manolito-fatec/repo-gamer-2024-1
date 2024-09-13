@@ -1,9 +1,11 @@
 package com.example.geoIot.service.person;
 
+import com.example.geoIot.Exception.PersonAlreadyExistsException;
 import com.example.geoIot.Exception.PersonNotFoundException;
 import com.example.geoIot.entity.Person;
 import com.example.geoIot.entity.dto.UpdatedPersonDto;
 import com.example.geoIot.repository.PersonRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,12 +28,15 @@ public class PersonServiceImpl  implements  PersonService{
     }
 
     @Override
+    @Transactional
     public void savePerson(Person pPerson) {
         this.validatePerson(pPerson);
+        this.personAlreadyExists(pPerson);
         this.personRepository.save(pPerson);
     }
 
     @Override
+    @Transactional
     public Person updatePerson(UpdatedPersonDto pPerson) {
         Person personUpdated = this.getPersonById(pPerson.idPerson());
         if(pPerson.fullName() != null){
@@ -43,6 +48,7 @@ public class PersonServiceImpl  implements  PersonService{
     }
 
     @Override
+    @Transactional
     public void deletePerson(Long pId) {
         Person person = this.getPersonById(pId);
         personRepository.delete(person);
@@ -61,6 +67,13 @@ public class PersonServiceImpl  implements  PersonService{
                 pPerson.getCodeDevice() == null ||
                 pPerson.getCodeDevice().isBlank()) {
                 throw new IllegalArgumentException("Some field is null or empty.");
+        }
+    }
+
+    private void personAlreadyExists(Person pPerson){
+        Optional<Person> personExists = personRepository.findById(pPerson.getIdPerson());
+        if (personExists.isPresent()) {
+            throw new PersonAlreadyExistsException();
         }
     }
 }
