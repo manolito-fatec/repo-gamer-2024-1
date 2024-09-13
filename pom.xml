@@ -12,7 +12,7 @@
 	<artifactId>ito1</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ito1</name>
-	<description>SEMNOMEAINDA2024-1</description>
+	<description>geoIoT2024-1</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -89,12 +89,17 @@
 			<artifactId>modelmapper</artifactId>
 			<version>3.2.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
 <!--
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 -->
 	</dependencies>
 
