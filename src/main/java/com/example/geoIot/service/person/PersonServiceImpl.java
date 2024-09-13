@@ -60,7 +60,7 @@ public class PersonServiceImpl  implements  PersonService{
                 pPerson.getFullName().isBlank() ||
                 pPerson.getCodeDevice() == null ||
                 pPerson.getCodeDevice().isBlank()) {
-                throw new IllegalArgumentException("The provided ID is null or empty.");
+                throw new IllegalArgumentException("Some field is null or empty.");
         }
     }
 }
