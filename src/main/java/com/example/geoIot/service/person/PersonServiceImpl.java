@@ -60,7 +60,8 @@ public class PersonServiceImpl  implements  PersonService{
     }
 
     private void validatePerson(Person pPerson) {
-        if(pPerson.getIdText() == null ||
+        if(pPerson == null ||
+                pPerson.getIdText() == null ||
                 pPerson.getIdText().isBlank() ||
                 pPerson.getFullName() == null ||
                 pPerson.getFullName().isBlank() ||
