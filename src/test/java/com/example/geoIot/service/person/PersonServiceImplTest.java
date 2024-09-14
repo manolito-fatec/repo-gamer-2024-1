@@ -44,7 +44,7 @@ class PersonServiceImplTest {
     @DisplayName("Should throw an exception when the person already exists in the system.")
     void exceptionShouldThrowAnExceptionWhenThePersonAlreadyExists(){
          this.person = new Person(
-                null,
+                 null,
                 "1640966C-BBAC-4A26-8A06-0670296D361C",
                 "Darwin Yoel Franco Vasquez",
                 "1435"
@@ -57,7 +57,7 @@ class PersonServiceImplTest {
     @DisplayName("Should throw an exception when any data of the person is invalid.")
     void exceptionShouldThrowAnExceptionWhenAnyDataOfThePersonIsInvalid(){
          this.person = new Person(
-                null,
+                 null,
                 "",
                 "Darwin Yoel Franco Vasquez",
                 "1435"

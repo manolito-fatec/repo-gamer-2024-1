@@ -59,7 +59,8 @@ public class PersonServiceImpl  implements  PersonService{
         return (Set<Person>) personRepository.findAll();
     }
 
-    private void validatePerson(Person pPerson) {
+
+    public void validatePerson(Person pPerson) {
         if(pPerson == null ||
                 pPerson.getIdText() == null ||
                 pPerson.getIdText().isBlank() ||

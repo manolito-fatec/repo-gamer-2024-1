@@ -5,6 +5,7 @@ import com.example.geoIot.entity.DeviceTracker;
 import com.example.geoIot.entity.Person;
 import com.example.geoIot.repository.DeviceTrackerRepository;
 import com.example.geoIot.repository.PersonRepository;
+import com.example.geoIot.service.person.PersonService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,9 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
     @Autowired
     private PersonRepository personRepository;
 
+    @Autowired
+    private PersonService personService;
+
     @Transactional
     @Override
     public void saveDeviceTracker(DeviceTracker pDeviceTracker) {
@@ -27,6 +31,8 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
         this.validatePersonAlreadyExists(pDeviceTracker.getPersonDeviceTracker());
         this.deviceTrackerRepository.save(pDeviceTracker);
     }
+
+
 
     private void validateDeviceTracker(DeviceTracker pDeviceTracker) {
         if(pDeviceTracker == null ||
@@ -37,6 +43,7 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
            pDeviceTracker.getLongitude() == null){
            throw new IllegalArgumentException("Some field is null or empty.");
         }
+        this.personService.validatePerson(pDeviceTracker.getPersonDeviceTracker());
     }
 
     private void validatePersonAlreadyExists(Person pPerson) {

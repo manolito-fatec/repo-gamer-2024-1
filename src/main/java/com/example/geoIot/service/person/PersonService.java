@@ -16,4 +16,7 @@ public interface PersonService {
     public void deletePerson(Long pId);
 
     public Set<Person> getAllPersons();
+
+    public void validatePerson(Person pPerson);
+
 }

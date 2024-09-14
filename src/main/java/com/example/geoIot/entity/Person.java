@@ -30,4 +30,5 @@ public class Person {
         this.fullName = pPerson.fullName();
         this.codeDevice = pPerson.codeDevice();
     }
+
 }
