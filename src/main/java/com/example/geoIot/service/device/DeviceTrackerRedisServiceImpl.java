@@ -5,13 +5,14 @@ import com.example.geoIot.entity.DeviceTracker;
 import com.example.geoIot.entity.DeviceTrackerRedis;
 import com.example.geoIot.entity.dto.DeviceTrackerRedisDto;
 import com.example.geoIot.repository.DeviceTrackerRedisRepository;
-import com.example.geoIot.repository.DeviceTrackerRepository;
 import com.example.geoIot.service.person.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,8 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService 
     @Autowired
     private DeviceTrackerService deviceTrackerService;
 
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+
     @Override
     public void saveDataInCache(List<DeviceTrackerRedisDto> pDeviceTrackerRedis) {
         if (pDeviceTrackerRedis.isEmpty()) {
@@ -39,10 +42,11 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService 
         }
         List<DeviceTrackerRedis> listConverted = this.convertToDeviceTrackerListRedis(pDeviceTrackerRedis);
         deviceTrackerRedisRepository.saveAll(listConverted);
+        this.synchronizeDataBase();
     }
 
     @Override
-    @Scheduled(fixedDelay = MINUTES)
+//  @Scheduled(fixedDelay = MINUTES)
     public void synchronizeDataBase() {
         List<DeviceTrackerRedis> deviceTrackerRedisList = this.findAllInRedis();
 
@@ -63,10 +67,10 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService 
                 .map(deviceTrackerRedisDto -> {
                     DeviceTrackerRedis deviceConvert = new DeviceTrackerRedis();
                     deviceConvert.setIdTextDeviceTracker(deviceTrackerRedisDto.Id());
-                    deviceConvert.setCreatedDeviceTracker(deviceTrackerRedisDto.CreatedAt());
-                    deviceConvert.setLatitude(deviceTrackerRedisDto.Latitude());
-                    deviceConvert.setLongitude(deviceTrackerRedisDto.Longitude());
-                    deviceConvert.setFullName(personService.findByFullName(deviceTrackerRedisDto.Fullname()));
+                    deviceConvert.setCreatedDeviceTracker(LocalDateTime.parse(deviceTrackerRedisDto.CreatedAt(), formatter));
+                    deviceConvert.setLatitude(BigDecimal.valueOf(deviceTrackerRedisDto.Latitude()));
+                    deviceConvert.setLongitude(BigDecimal.valueOf(deviceTrackerRedisDto.Longitude()));
+                    deviceConvert.setFullName(personService.findByFullName(deviceTrackerRedisDto.FullName()));
                     return deviceConvert;
                 })
                 .collect(Collectors.toList());

@@ -13,15 +13,19 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class DeviceTrackerServiceImplTest {
 
     @InjectMocks
@@ -35,67 +39,73 @@ class DeviceTrackerServiceImplTest {
     @Mock
     private PersonService personService;
 
-    private Person person = new Person( 1l, "1640966C-BBAC-4A26-8A06-0670296D361C", "Darwin Yoel Franco Vasquez", "1435");
+    private Person person = new Person(
+            1l,
+            "72E66DD7-DC7B-4C6E-B4F4-328E256DF9BA",
+            "VALDEMIR OLIVEIRA DOS SANTOS",
+            "4185");
+
+    private DeviceTracker deviceTracker1 = new DeviceTracker(
+            null,
+            "1640966C-BBAC-4A26-8A06-0670296D361C",
+            LocalDateTime.now(),
+            new BigDecimal(0.5840530000),
+            new BigDecimal(-60.4578730000),
+            person
+    );
+    private DeviceTracker deviceTracker2 = new DeviceTracker(
+            null,
+            "53CA1452-77FF-4B77-94CF-0037B3C00054",
+            LocalDateTime.now(),
+            new BigDecimal(0.5840530000),
+            new BigDecimal(-60.4578730000),
+            person
+    );
+    private DeviceTracker deviceTracker3 = new DeviceTracker(
+            null,
+            "DD287909-46BE-4E8B-A926-0056596288B1",
+            LocalDateTime.now(),
+            new BigDecimal(0.5840530000),
+            new BigDecimal(-60.4578730000),
+            person
+    );
 
     @Test
     @DisplayName("should register a device tracker.")
     void shouldRegisterPerson(){
-        DeviceTracker deviceTracker1 = new DeviceTracker(
-                null,
-                "1640966C-BBAC-4A26-8A06-0670296D361C",
-                LocalDateTime.now(),
-                new BigDecimal(0.5840530000),
-                new BigDecimal(-60.4578730000),
-                person
-        );
-        DeviceTracker deviceTracker2 = new DeviceTracker(
-                null,
-                "1640966C-BBAC-4A26-8A06-0670296D361C",
-                LocalDateTime.now(),
-                new BigDecimal(0.5840530000),
-                new BigDecimal(-60.4578730000),
-                person
-        );
-        DeviceTracker deviceTracker3 = new DeviceTracker(
-                null,
-                "1640966C-BBAC-4A26-8A06-0670296D361C",
-                LocalDateTime.now(),
-                new BigDecimal(0.5840530000),
-                new BigDecimal(-60.4578730000),
-                person
-        );
+        List<DeviceTracker> listOfDeviceTrackers = new ArrayList<>();
+        listOfDeviceTrackers.add(deviceTracker1);
+        listOfDeviceTrackers.add(deviceTracker2);
+        listOfDeviceTrackers.add(deviceTracker3);
         BDDMockito.given(personRepository.findByIdText(person.getIdText())).willReturn(Optional.of(person));
-        assertDoesNotThrow(() -> deviceService.saveDeviceTracker(deviceTracker));
+        assertDoesNotThrow(() -> deviceService.saveDeviceTracker(listOfDeviceTrackers));
     }
 
     @Test
     @DisplayName("Should throw an exception when the person not exists in the system.")
     void exceptionShouldThrowAnExceptionWhenThePersonNotExistsInSystem(){
-        this.deviceTracker = new DeviceTracker(
-                null,
-                "1640966C-BBAC-4A26-8A06-0670296D361C",
-                LocalDateTime.now(),
-                new BigDecimal(0.5840530000),
-                new BigDecimal(-60.4578730000),
-                person
-        );
+        List<DeviceTracker> listOfDeviceTrackers = new ArrayList<>();
+        listOfDeviceTrackers.add(deviceTracker1);
+        listOfDeviceTrackers.add(deviceTracker2);
+        listOfDeviceTrackers.add(deviceTracker3);
         BDDMockito.given(personRepository.findByIdText(person.getIdText())).willReturn(Optional.empty());
-        assertThrowsExactly(PersonNotFoundException.class, () ->deviceService.saveDeviceTracker(deviceTracker));
+        assertThrowsExactly(PersonNotFoundException.class, () ->deviceService.saveDeviceTracker(listOfDeviceTrackers));
     }
 
     @Test
     @DisplayName("Should throw an exception when any data of the DeviceTracker is invalid.")
     void exceptionShouldThrowAnExceptionWhenAnyDataOfTheDeviceTrackerIsInvalid(){
-        this.deviceTracker = new DeviceTracker(
+        List<DeviceTracker> listOfDeviceTrackers = new ArrayList<>();
+        listOfDeviceTrackers.add(new DeviceTracker(
                 null,
-                "",
-                LocalDateTime.now(),
+                "DD287909-46BE-4E8B-A926-0056596288B1",
+                null,
                 new BigDecimal(0.5840530000),
                 new BigDecimal(-60.4578730000),
                 person
-        );
-        assertThrowsExactly(IllegalArgumentException.class, () ->deviceService.saveDeviceTracker(this.deviceTracker));
+        ));
+        BDDMockito.given(personRepository.findByFullName(person.getFullName())).willReturn(Optional.of(person));
+        assertThrowsExactly(IllegalArgumentException.class, () ->deviceService.saveDeviceTracker(listOfDeviceTrackers));
     }
-
 
 }

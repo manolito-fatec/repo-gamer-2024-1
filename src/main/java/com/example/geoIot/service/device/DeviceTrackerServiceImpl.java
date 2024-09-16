@@ -22,8 +22,6 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
     @Autowired
     private PersonRepository personRepository;
 
-    @Autowired
-    private PersonService personService;
 
     @Transactional
     @Override
@@ -46,7 +44,6 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
            pDeviceTracker.getLongitude() == null){
            throw new IllegalArgumentException("Some field is null or empty.");
         }
-        this.personService.validatePerson(pDeviceTracker.getPersonDeviceTracker());
     }
 
     private void validatePersonAlreadyExists(Person pPerson) {
