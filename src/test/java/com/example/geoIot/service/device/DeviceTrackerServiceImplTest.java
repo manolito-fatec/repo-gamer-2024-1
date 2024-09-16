@@ -1,6 +1,6 @@
 package com.example.geoIot.service.device;
 
-import com.example.geoIot.Exception.PersonNotFoundException;
+import com.example.geoIot.exception.PersonNotFoundException;
 import com.example.geoIot.entity.DeviceTracker;
 import com.example.geoIot.entity.Person;
 import com.example.geoIot.repository.DeviceTrackerRepository;
@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,7 +31,7 @@ class DeviceTrackerServiceImplTest {
     @Mock
     private DeviceTrackerRepository deviceTrackerRepository;
     @Mock
-    private DeviceTracker deviceTracker;
+    private List<DeviceTracker> deviceTracker;
     @Mock
     private PersonService personService;
 
@@ -39,7 +40,23 @@ class DeviceTrackerServiceImplTest {
     @Test
     @DisplayName("should register a device tracker.")
     void shouldRegisterPerson(){
-        this.deviceTracker = new DeviceTracker(
+        DeviceTracker deviceTracker1 = new DeviceTracker(
+                null,
+                "1640966C-BBAC-4A26-8A06-0670296D361C",
+                LocalDateTime.now(),
+                new BigDecimal(0.5840530000),
+                new BigDecimal(-60.4578730000),
+                person
+        );
+        DeviceTracker deviceTracker2 = new DeviceTracker(
+                null,
+                "1640966C-BBAC-4A26-8A06-0670296D361C",
+                LocalDateTime.now(),
+                new BigDecimal(0.5840530000),
+                new BigDecimal(-60.4578730000),
+                person
+        );
+        DeviceTracker deviceTracker3 = new DeviceTracker(
                 null,
                 "1640966C-BBAC-4A26-8A06-0670296D361C",
                 LocalDateTime.now(),

@@ -19,4 +19,6 @@ public interface PersonService {
 
     public void validatePerson(Person pPerson);
 
+    public Person findByFullName(String fullName);
+
 }
