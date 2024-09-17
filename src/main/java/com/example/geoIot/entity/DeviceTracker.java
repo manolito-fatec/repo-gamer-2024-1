@@ -19,19 +19,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Builder
-@Table(name="device_tracker")
+@Table(name="tracker")
 public class DeviceTracker {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id_device_tracker")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_tracker")
     private Long idDeviceTracker;
-    @Column(name = "id_text_device_tracker")
+    @Column(name = "ito_tracker_code")
     private String idTextDeviceTracker;
-    @Column(name = "created_at_device_tracker")
+    @Column(name = "created_at")
     private LocalDateTime createdDeviceTracker;
-    @Column(name="latitude_device_tracker")
+    @Column(name="latitude")
     private BigDecimal latitude;
-    @Column(name="longitude_device_tracker")
+    @Column(name="longitude")
     private BigDecimal longitude;
 
     @ManyToOne
