@@ -15,14 +15,14 @@ import lombok.Setter;
 @Table(name="person")
 public class Person {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name ="id_person")
     private Long idPerson;
-    @Column(name ="id_text_person")
+    @Column(name ="ito_person_code")
     private String idText;
-    @Column(name ="full_name_person")
+    @Column(name ="name")
     private String fullName;
-    @Column(name ="code_device_person")
+    @Column(name ="device_code")
     private String codeDevice;
 
     public Person(RegisterPersonDto pPerson) {
