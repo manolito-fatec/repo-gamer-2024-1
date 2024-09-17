@@ -1,5 +1,6 @@
 package com.example.geoIot.service.device;
 
+import com.example.geoIot.entity.dto.DeviceTrackerDto;
 import com.example.geoIot.exception.PersonNotFoundException;
 import com.example.geoIot.entity.DeviceTracker;
 import com.example.geoIot.entity.Person;
@@ -106,6 +107,12 @@ class DeviceTrackerServiceImplTest {
         ));
         BDDMockito.given(personRepository.findByFullName(person.getFullName())).willReturn(Optional.of(person));
         assertThrowsExactly(IllegalArgumentException.class, () ->deviceService.saveDeviceTracker(listOfDeviceTrackers));
+    }
+
+    @Test
+    @DisplayName("Should return a List of DeviceTracker entries between the given dates")
+    void getDeviceTrackerListByPeriod(){
+        List<DeviceTrackerDto> dtoList = new ArrayList<>();
     }
 
 }
