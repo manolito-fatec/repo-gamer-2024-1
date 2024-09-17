@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface DeviceTrackerRepository extends JpaRepository<DeviceTracker, Long>{
 
-    public Optional<List<DeviceTracker>> findByPersonDeviceTrackerIdAndCreatedAtDeviceTrackerBetween(Long personId, LocalDateTime init, LocalDateTime end);
+    public Optional<List<DeviceTracker>> findByPersonDeviceTrackerIdPersonAndCreatedAtDeviceTrackerBetween(Long personId, LocalDateTime init, LocalDateTime end);
 }

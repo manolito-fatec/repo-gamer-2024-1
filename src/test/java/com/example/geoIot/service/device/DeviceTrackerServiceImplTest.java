@@ -121,7 +121,7 @@ class DeviceTrackerServiceImplTest {
         listOfDeviceTrackers.add(deviceTracker2);
         listOfDeviceTrackers.add(deviceTracker3);
 
-        BDDMockito.given(deviceTrackerRepository.findByPersonDeviceTrackerIdAndCreatedAtDeviceTrackerBetween(
+        BDDMockito.given(deviceTrackerRepository.findByPersonDeviceTrackerIdPersonAndCreatedAtDeviceTrackerBetween(
                 person.getIdPerson(), init, end))
                 .willReturn(Optional.of(listOfDeviceTrackers));
 

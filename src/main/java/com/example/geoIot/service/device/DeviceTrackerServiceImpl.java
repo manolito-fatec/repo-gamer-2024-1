@@ -39,7 +39,7 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
     @Override
     public List<DeviceTrackerDto> getDeviceTrackerByDateInterval(DeviceTrackerPeriodRequestDto requestDto) {
         Optional<List<DeviceTracker>> deviceTrackerList = deviceTrackerRepository
-                .findByPersonDeviceTrackerIdAndCreatedAtDeviceTrackerBetween(
+                .findByPersonDeviceTrackerIdPersonAndCreatedAtDeviceTrackerBetween(
                         requestDto.getPersonId(),
                         requestDto.getInit(),
                         requestDto.getEnd());
