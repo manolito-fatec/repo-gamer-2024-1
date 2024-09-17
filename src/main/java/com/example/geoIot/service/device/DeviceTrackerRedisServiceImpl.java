@@ -67,7 +67,7 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService 
                 .map(deviceTrackerRedisDto -> {
                     DeviceTrackerRedis deviceConvert = new DeviceTrackerRedis();
                     deviceConvert.setIdTextDeviceTracker(deviceTrackerRedisDto.Id());
-                    deviceConvert.setCreatedDeviceTracker(LocalDateTime.parse(deviceTrackerRedisDto.CreatedAt(), formatter));
+                    deviceConvert.setCreatedAtDeviceTracker(LocalDateTime.parse(deviceTrackerRedisDto.CreatedAt(), formatter));
                     deviceConvert.setLatitude(BigDecimal.valueOf(deviceTrackerRedisDto.Latitude()));
                     deviceConvert.setLongitude(BigDecimal.valueOf(deviceTrackerRedisDto.Longitude()));
                     deviceConvert.setFullName(personService.findByFullName(deviceTrackerRedisDto.FullName()));
@@ -81,7 +81,7 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService 
                 .map(deviceTrackerRedis-> {
                     DeviceTracker deviceConvert = new DeviceTracker();
                     deviceConvert.setIdTextDeviceTracker(deviceTrackerRedis.getIdTextDeviceTracker());
-                    deviceConvert.setCreatedDeviceTracker(deviceTrackerRedis.getCreatedDeviceTracker());
+                    deviceConvert.setCreatedAtDeviceTracker(deviceTrackerRedis.getCreatedAtDeviceTracker());
                     deviceConvert.setLatitude(deviceTrackerRedis.getLatitude());
                     deviceConvert.setLongitude(deviceTrackerRedis.getLongitude());
                     deviceConvert.setPersonDeviceTracker(deviceTrackerRedis.getFullName());
