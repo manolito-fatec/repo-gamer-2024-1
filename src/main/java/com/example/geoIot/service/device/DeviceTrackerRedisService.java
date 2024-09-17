@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface DeviceTrackerRedisService{
 
-    public void saveDataInCache(List<DeviceTrackerRedisDto> deviceTrackerRedis);
+    void saveDataInCache(List<DeviceTrackerRedisDto> deviceTrackerRedis);
 
-    public void synchronizeDataBase();
+    void synchronizeDataBase();
 }
