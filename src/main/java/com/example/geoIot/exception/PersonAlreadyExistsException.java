@@ -1,4 +1,4 @@
-package com.example.geoIot.Exception;
+package com.example.geoIot.exception;
 
 public class PersonAlreadyExistsException extends RuntimeException{
     public PersonAlreadyExistsException(){

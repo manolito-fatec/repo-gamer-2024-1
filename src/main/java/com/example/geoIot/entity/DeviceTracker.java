@@ -8,10 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -21,19 +18,20 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="device_tracker")
+@Builder
+@Table(name="tracker")
 public class DeviceTracker {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id_device_tracker")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_tracker")
     private Long idDeviceTracker;
-    @Column(name = "id_text_device_tracker")
+    @Column(name = "ito_tracker_code")
     private String idTextDeviceTracker;
-    @Column(name = "created_at_device_tracker")
+    @Column(name = "created_at")
     private LocalDateTime createdDeviceTracker;
-    @Column(name="latitude_device_tracker")
+    @Column(name="latitude")
     private BigDecimal latitude;
-    @Column(name="longitude_device_tracker")
+    @Column(name="longitude")
     private BigDecimal longitude;
 
     @ManyToOne
