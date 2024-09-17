@@ -1,6 +1,6 @@
 package com.example.geoIot.service.device;
 
-import com.example.geoIot.Exception.PersonNotFoundException;
+import com.example.geoIot.exception.PersonNotFoundException;
 import com.example.geoIot.entity.DeviceTracker;
 import com.example.geoIot.entity.Person;
 import com.example.geoIot.repository.DeviceTrackerRepository;
@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,15 +22,15 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
     @Autowired
     private PersonRepository personRepository;
 
-    @Autowired
-    private PersonService personService;
 
     @Transactional
     @Override
-    public void saveDeviceTracker(DeviceTracker pDeviceTracker) {
-        this.validateDeviceTracker(pDeviceTracker);
-        this.validatePersonAlreadyExists(pDeviceTracker.getPersonDeviceTracker());
-        this.deviceTrackerRepository.save(pDeviceTracker);
+    public void saveDeviceTracker(List<DeviceTracker> pDeviceTracker) {
+        pDeviceTracker.forEach(deviceTracker -> {
+            this.validateDeviceTracker(deviceTracker);
+            this.validatePersonAlreadyExists(deviceTracker.getPersonDeviceTracker());
+        });
+        this.deviceTrackerRepository.saveAll(pDeviceTracker);
     }
 
 
@@ -43,7 +44,6 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
            pDeviceTracker.getLongitude() == null){
            throw new IllegalArgumentException("Some field is null or empty.");
         }
-        this.personService.validatePerson(pDeviceTracker.getPersonDeviceTracker());
     }
 
     private void validatePersonAlreadyExists(Person pPerson) {

@@ -1,7 +1,7 @@
 package com.example.geoIot.service.person;
 
-import com.example.geoIot.Exception.PersonAlreadyExistsException;
-import com.example.geoIot.Exception.PersonNotFoundException;
+import com.example.geoIot.exception.PersonAlreadyExistsException;
+import com.example.geoIot.exception.PersonNotFoundException;
 import com.example.geoIot.entity.Person;
 import com.example.geoIot.entity.dto.UpdatedPersonDto;
 import com.example.geoIot.repository.PersonRepository;
