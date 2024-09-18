@@ -28,7 +28,7 @@ public class DeviceTracker {
     @Column(name = "ito_tracker_code")
     private String idTextDeviceTracker;
     @Column(name = "created_at")
-    private LocalDateTime createdDeviceTracker;
+    private LocalDateTime createdAtDeviceTracker;
     @Column(name="latitude")
     private BigDecimal latitude;
     @Column(name="longitude")

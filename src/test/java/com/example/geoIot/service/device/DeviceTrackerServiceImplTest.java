@@ -1,5 +1,7 @@
 package com.example.geoIot.service.device;
 
+import com.example.geoIot.entity.dto.DeviceTrackerDto;
+import com.example.geoIot.entity.dto.DeviceTrackerPeriodRequestDto;
 import com.example.geoIot.exception.PersonNotFoundException;
 import com.example.geoIot.entity.DeviceTracker;
 import com.example.geoIot.entity.Person;
@@ -108,4 +110,36 @@ class DeviceTrackerServiceImplTest {
         assertThrowsExactly(IllegalArgumentException.class, () ->deviceService.saveDeviceTracker(listOfDeviceTrackers));
     }
 
+    @Test
+    @DisplayName("Should return a List of DeviceTracker entries between the given dates")
+    void getDeviceTrackerListByPeriod(){
+        LocalDateTime init = LocalDateTime.of(2024,9,1,0,0);
+        LocalDateTime end = LocalDateTime.of(2024,9,7,23,59);
+
+        List<DeviceTracker> listOfDeviceTrackers = new ArrayList<>();
+        listOfDeviceTrackers.add(deviceTracker1);
+        listOfDeviceTrackers.add(deviceTracker2);
+        listOfDeviceTrackers.add(deviceTracker3);
+
+        BDDMockito.given(deviceTrackerRepository.findByPersonDeviceTrackerIdPersonAndCreatedAtDeviceTrackerBetween(
+                person.getIdPerson(), init, end))
+                .willReturn(Optional.of(listOfDeviceTrackers));
+
+        DeviceTrackerPeriodRequestDto requestDto = DeviceTrackerPeriodRequestDto.builder()
+                .personId(person.getIdPerson())
+                .init(init)
+                .end(end)
+                .build();
+        List<DeviceTrackerDto> result = deviceService.getDeviceTrackerByDateInterval(requestDto);
+
+        // Expected quantity & notNull verification
+        assertNotNull(result);
+        assertEquals(3, result.size());
+
+        // Content test between Entity in Mockito & DTO
+        DeviceTrackerDto deviceTrackerDto = result.get(0);
+        assertEquals(deviceTracker1.getIdDeviceTracker(), deviceTrackerDto.getId());
+        assertEquals(deviceTracker1.getLatitude(), deviceTrackerDto.getLatitude());
+        assertEquals(deviceTracker1.getLongitude(), deviceTrackerDto.getLongitude());
+    }
 }
