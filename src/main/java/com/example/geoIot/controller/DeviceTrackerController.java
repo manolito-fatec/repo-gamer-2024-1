@@ -19,17 +19,8 @@ public class DeviceTrackerController {
     private DeviceTrackerService service;
 
     @GetMapping("/period/")
-    public ResponseEntity<?> getByPeriod(
-            @RequestParam Long personId,
-            @RequestParam LocalDateTime init,
-            @RequestParam LocalDateTime end
-            ) {
+    public ResponseEntity<?> getByPeriod(@RequestBody DeviceTrackerPeriodRequestDto requestDto) {
         try {
-            DeviceTrackerPeriodRequestDto requestDto = DeviceTrackerPeriodRequestDto.builder()
-                    .personId(personId)
-                    .init(init)
-                    .end(end)
-                    .build();
             List<DeviceTrackerDto> dtoList = service.getDeviceTrackerByDateInterval(requestDto);
             return ResponseEntity.ok(dtoList);
         } catch (NoSuchElementException noSuchElementException) {
