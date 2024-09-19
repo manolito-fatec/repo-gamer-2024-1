@@ -13,14 +13,24 @@ import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/tracker")
+@CrossOrigin
 public class DeviceTrackerController {
 
     @Autowired
     private DeviceTrackerService service;
 
-    @GetMapping("/period/")
-    public ResponseEntity<?> getByPeriod(@RequestBody DeviceTrackerPeriodRequestDto requestDto) {
+    @GetMapping("/period/{personId}/{init}/{end}")
+    public ResponseEntity<?> getByPeriod(
+            @PathVariable Long personId,
+            @PathVariable LocalDateTime init,
+            @PathVariable LocalDateTime end
+    ) {
         try {
+            DeviceTrackerPeriodRequestDto requestDto = DeviceTrackerPeriodRequestDto.builder()
+                    .personId(personId)
+                    .init(init)
+                    .end(end)
+                    .build();
             List<DeviceTrackerDto> dtoList = service.getDeviceTrackerByDateInterval(requestDto);
             return ResponseEntity.ok(dtoList);
         } catch (NoSuchElementException noSuchElementException) {
