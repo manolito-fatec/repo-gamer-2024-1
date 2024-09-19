@@ -1,9 +1,11 @@
 package com.example.geoIot.service.device;
 
+import com.example.geoIot.entity.Person;
 import com.example.geoIot.exception.EmptyDataListInRedisException;
 import com.example.geoIot.entity.DeviceTracker;
 import com.example.geoIot.entity.DeviceTrackerRedis;
 import com.example.geoIot.entity.dto.DeviceTrackerRedisDto;
+import com.example.geoIot.exception.PersonNotFoundException;
 import com.example.geoIot.repository.DeviceTrackerRedisRepository;
 import com.example.geoIot.service.person.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,10 +40,11 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService 
 
     @Override
     public void saveDataInCache(List<DeviceTrackerRedisDto> pDeviceTrackerRedis) {
+        Set<Person> personSet = this.personService.getAllPersons();
         if (pDeviceTrackerRedis.isEmpty()) {
             throw new EmptyDataListInRedisException();
         }
-        List<DeviceTrackerRedis> listConverted = this.convertToDeviceTrackerListRedis(pDeviceTrackerRedis);
+        List<DeviceTrackerRedis> listConverted = this.convertToDeviceTrackerListRedis(pDeviceTrackerRedis,personSet );
         deviceTrackerRedisRepository.saveAll(listConverted);
         this.synchronizeDataBase();
     }
@@ -62,7 +66,7 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService 
         return (List<DeviceTrackerRedis>)deviceTrackerRedisRepository.findAll();
     }
 
-    public List<DeviceTrackerRedis> convertToDeviceTrackerListRedis(List<DeviceTrackerRedisDto> pDeviceTrackerRedis) {
+    public List<DeviceTrackerRedis> convertToDeviceTrackerListRedis(List<DeviceTrackerRedisDto> pDeviceTrackerRedis, Set<Person> pPersonSet) {
         return pDeviceTrackerRedis.stream()
                 .map(deviceTrackerRedisDto -> {
                     DeviceTrackerRedis deviceConvert = new DeviceTrackerRedis();
@@ -70,10 +74,21 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService 
                     deviceConvert.setCreatedAtDeviceTracker(LocalDateTime.parse(deviceTrackerRedisDto.CreatedAt(), formatter));
                     deviceConvert.setLatitude(BigDecimal.valueOf(deviceTrackerRedisDto.Latitude()));
                     deviceConvert.setLongitude(BigDecimal.valueOf(deviceTrackerRedisDto.Longitude()));
-                    deviceConvert.setFullName(personService.findByFullName(deviceTrackerRedisDto.FullName()));
+                    deviceConvert.setFullName(this.convertToPerson(deviceTrackerRedisDto.FullName(), pPersonSet));
                     return deviceConvert;
                 })
                 .collect(Collectors.toList());
+    }
+
+    protected Person convertToPerson(String pPersonName,Set<Person> pPersonSet) {
+        Person personConvert = pPersonSet.stream()
+                .filter(p -> p.getFullName().equals(pPersonName))
+                .findFirst()
+                .orElse(null);
+        if(personConvert == null) {
+            throw new PersonNotFoundException();
+        }
+        return personConvert;
     }
 
     public List<DeviceTracker> convertToDeviceTrackerList( List<DeviceTrackerRedis> pDeviceTrackerRedis){
