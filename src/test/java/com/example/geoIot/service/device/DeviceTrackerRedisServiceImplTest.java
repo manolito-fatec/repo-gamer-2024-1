@@ -5,6 +5,7 @@ import com.example.geoIot.entity.DeviceTrackerRedis;
 import com.example.geoIot.entity.Person;
 import com.example.geoIot.entity.dto.DeviceTrackerRedisDto;
 import com.example.geoIot.exception.EmptyDataListInRedisException;
+import com.example.geoIot.exception.PersonNotFoundException;
 import com.example.geoIot.service.person.PersonService;
 
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +19,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +36,20 @@ class DeviceTrackerRedisServiceImplTest {
                     "72E66DD7-DC7B-4C6E-B4F4-328E256DF9BA",
                     "VALDEMIR OLIVEIRA DOS SANTOS",
                     "4185"
+    );
+
+    private Person person2 = new Person(
+            2l,
+            "72705EC2-308D-4665-8132-25368D1D13C7",
+            "ESTER DE FREITAS DE LIMA",
+            "4185"
+    );
+
+    private Person person3 = new Person(
+            3l,
+            "04B6C39D-1C3B-4EED-BD0D-0701B94FB5AEA",
+            "Antônio Carlos Batista Ferreira Brito",
+            "Card_506A"
     );
 
 
@@ -85,9 +102,13 @@ class DeviceTrackerRedisServiceImplTest {
         List<DeviceTrackerRedisDto> dtoList = new ArrayList<>();
         dtoList.add(dto1);
         dtoList.add(dto2);
+        Set<Person> personSet = new HashSet<>();
+        personSet.add(person);
+        personSet.add(person2);
+        personSet.add(person3);
+        String namePerson = "VALDEMIR OLIVEIRA DOS SANTOS";
 
-        BDDMockito.given(personService.findByFullName(person.getFullName())).willReturn(person);
-        assertInstanceOf(DeviceTrackerRedis.class, deviceServiceRedis.convertToDeviceTrackerListRedis(dtoList).get(0));
+        assertInstanceOf(DeviceTrackerRedis.class, deviceServiceRedis.convertToDeviceTrackerListRedis(dtoList,personSet).get(0));
     }
 
     @Test
@@ -100,4 +121,27 @@ class DeviceTrackerRedisServiceImplTest {
         assertInstanceOf(DeviceTracker.class, deviceServiceRedis.convertToDeviceTrackerList(dtoList).get(0));
     }
 
+    @Test
+    @DisplayName("Should get Person in list")
+    void shouldGetPersonInList() {
+        Set<Person> personSet = new HashSet<>();
+        personSet.add(person);
+        personSet.add(person2);
+        personSet.add(person3);
+        String namePerson = "VALDEMIR OLIVEIRA DOS SANTOS";
+
+       assertEquals(deviceServiceRedis.convertToPerson(namePerson, personSet), person);
+    }
+
+    @Test
+    @DisplayName("Should throw the PersonNotFoundException when name not exist")
+    void shouldThrowPersonNotFoundExceptionWhenNameNotExist() {
+        Set<Person> personSet = new HashSet<>();
+        personSet.add(person);
+        personSet.add(person2);
+        personSet.add(person3);
+        String namePerson = "Bob Esponja";
+
+        assertThrows(PersonNotFoundException.class, ()->deviceServiceRedis.convertToPerson(namePerson, personSet));
+    }
 }
