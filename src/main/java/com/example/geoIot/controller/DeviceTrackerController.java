@@ -18,12 +18,13 @@ import java.util.NoSuchElementException;
 @Tag(name = "Consulta - Controller", description = "Endpoints para consultar dispositivos e pessoas por período")
 @RestController
 @RequestMapping("/tracker")
+@CrossOrigin
 public class DeviceTrackerController {
 
     @Autowired
     private DeviceTrackerService service;
 
-    @GetMapping("/period/")
+    @GetMapping("/period/{personId}/{init}/{end}")
     @Operation(summary = "Consultar dados para plotagem", description = "Faz uma requisição ao OracleCloud trazendo os dados de um dispositivo por período")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Pessoa encontrada com sucesso."),
@@ -32,10 +33,10 @@ public class DeviceTrackerController {
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor ao tentar buscar a pessoa.")
     })
     public ResponseEntity<?> getByPeriod(
-            @RequestParam Long personId,
-            @RequestParam LocalDateTime init,
-            @RequestParam LocalDateTime end
-            ) {
+            @PathVariable Long personId,
+            @PathVariable LocalDateTime init,
+            @PathVariable LocalDateTime end
+    ) {
         try {
             DeviceTrackerPeriodRequestDto requestDto = DeviceTrackerPeriodRequestDto.builder()
                     .personId(personId)
