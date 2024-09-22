@@ -17,6 +17,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -111,7 +114,7 @@ class DeviceTrackerServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should return a List of DeviceTracker entries between the given dates")
+    @DisplayName("Should return a Page of DeviceTracker entries between the given dates")
     void getDeviceTrackerListByPeriod(){
         LocalDateTime init = LocalDateTime.of(2024,9,1,0,0);
         LocalDateTime end = LocalDateTime.of(2024,9,7,23,59);
@@ -121,23 +124,25 @@ class DeviceTrackerServiceImplTest {
         listOfDeviceTrackers.add(deviceTracker2);
         listOfDeviceTrackers.add(deviceTracker3);
 
-        BDDMockito.given(deviceTrackerRepository.findByPersonDeviceTrackerIdPersonAndCreatedAtDeviceTrackerBetween(
-                person.getIdPerson(), init, end))
-                .willReturn(Optional.of(listOfDeviceTrackers));
+        Page<DeviceTracker> deviceTrackerPage = new PageImpl<>(listOfDeviceTrackers);
+        BDDMockito.given(deviceTrackerRepository
+                        .findByPersonDeviceTrackerIdPersonAndCreatedAtDeviceTrackerBetweenOrderByCreatedAtDeviceTracker(
+                person.getIdPerson(), init, end, Pageable.unpaged()))
+                .willReturn(deviceTrackerPage);
 
         DeviceTrackerPeriodRequestDto requestDto = DeviceTrackerPeriodRequestDto.builder()
                 .personId(person.getIdPerson())
                 .init(init)
                 .end(end)
                 .build();
-        List<DeviceTrackerDto> result = deviceService.getDeviceTrackerByDateInterval(requestDto);
+        Page<DeviceTrackerDto> result = deviceService.getDeviceTrackerByDateInterval(requestDto, Pageable.unpaged());
 
         // Expected quantity & notNull verification
         assertNotNull(result);
-        assertEquals(3, result.size());
+        assertEquals(3, result.getContent().size());
 
         // Content test between Entity in Mockito & DTO
-        DeviceTrackerDto deviceTrackerDto = result.get(0);
+        DeviceTrackerDto deviceTrackerDto = result.getContent().get(0);
         assertEquals(deviceTracker1.getIdDeviceTracker(), deviceTrackerDto.getId());
         assertEquals(deviceTracker1.getLatitude(), deviceTrackerDto.getLatitude());
         assertEquals(deviceTracker1.getLongitude(), deviceTrackerDto.getLongitude());
