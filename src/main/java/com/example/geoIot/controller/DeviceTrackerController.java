@@ -30,6 +30,7 @@ public class DeviceTrackerController {
     @Operation(summary = "Consultar dados para plotagem", description = "Faz uma requisição ao OracleCloud trazendo os dados de um dispositivo por período")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Pessoa encontrada com sucesso."),
+            @ApiResponse(responseCode = "204", description = "Página da requisição vazia, os elementos acabaram na página anterior.");
             @ApiResponse(responseCode = "404", description = "Pessoa com o ID fornecido não foi encontrada."),
             @ApiResponse(responseCode = "408", description = "Tempo de resposta excedido."),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor ao tentar buscar a pessoa.")
@@ -51,7 +52,7 @@ public class DeviceTrackerController {
             Page<DeviceTrackerDto> dtoPage = service.getDeviceTrackerByDateInterval(requestDto, pageable);
             return ResponseEntity.ok(dtoPage);
         } catch (NoSuchElementException noSuchElementException) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
