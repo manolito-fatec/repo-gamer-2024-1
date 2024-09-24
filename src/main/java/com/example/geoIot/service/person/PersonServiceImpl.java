@@ -9,8 +9,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class PersonServiceImpl  implements  PersonService{
@@ -56,7 +58,9 @@ public class PersonServiceImpl  implements  PersonService{
 
     @Override
     public Set<Person> getAllPersons() {
-        return (Set<Person>) personRepository.findAll();
+        Set<Person> setPersons = new HashSet<>();
+        setPersons.addAll(this.personRepository.findAll());
+        return setPersons;
     }
 
 

@@ -10,11 +10,13 @@ import com.example.geoIot.repository.DeviceTrackerRedisRepository;
 import com.example.geoIot.service.person.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,12 +25,10 @@ import java.util.stream.Collectors;
 @EnableScheduling
 public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService {
 
-
     private final long MINUTES = 1000 * 60;
 
     @Autowired
     private DeviceTrackerRedisRepository deviceTrackerRedisRepository;
-
 
     @Autowired
     private PersonService personService;
@@ -38,28 +38,28 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService 
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
+    private  Set<Person> personSet = new HashSet<>();
+
     @Override
     public void saveDataInCache(List<DeviceTrackerRedisDto> pDeviceTrackerRedis) {
-        Set<Person> personSet = this.personService.getAllPersons();
         if (pDeviceTrackerRedis.isEmpty()) {
             throw new EmptyDataListInRedisException();
         }
-        List<DeviceTrackerRedis> listConverted = this.convertToDeviceTrackerListRedis(pDeviceTrackerRedis,personSet );
+        List<DeviceTrackerRedis> listConverted = this.convertToDeviceTrackerListRedis(pDeviceTrackerRedis,personSet);
         deviceTrackerRedisRepository.saveAll(listConverted);
-        this.synchronizeDataBase();
     }
 
     @Override
-//  @Scheduled(fixedDelay = MINUTES)
+    @Scheduled(fixedDelay = MINUTES)
     public void synchronizeDataBase() {
+        this.personSet = personService.getAllPersons();
         List<DeviceTrackerRedis> deviceTrackerRedisList = this.findAllInRedis();
 
-       if(deviceTrackerRedisList == null || deviceTrackerRedisList.isEmpty()){
-           throw new EmptyDataListInRedisException();
+       if(!(deviceTrackerRedisList == null) || !(deviceTrackerRedisList.isEmpty())){
+           List<DeviceTracker> deviceTrackerList = this.convertToDeviceTrackerList(deviceTrackerRedisList);
+           this.deviceTrackerService.saveDeviceTracker(deviceTrackerList);
+           this.deviceTrackerRedisRepository.deleteAll();
        }
-       List<DeviceTracker> deviceTrackerList = this.convertToDeviceTrackerList(deviceTrackerRedisList);
-       this.deviceTrackerService.saveDeviceTracker(deviceTrackerList);
-       this.deviceTrackerRedisRepository.deleteAll();
     }
 
     public List<DeviceTrackerRedis> findAllInRedis(){
