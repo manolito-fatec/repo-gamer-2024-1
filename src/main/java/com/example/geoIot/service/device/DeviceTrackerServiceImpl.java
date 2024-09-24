@@ -9,9 +9,10 @@ import com.example.geoIot.repository.DeviceTrackerRepository;
 import com.example.geoIot.repository.PersonRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -37,20 +38,18 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
 
     @Transactional
     @Override
-    public List<DeviceTrackerDto> getDeviceTrackerByDateInterval(DeviceTrackerPeriodRequestDto requestDto) {
-        Optional<List<DeviceTracker>> deviceTrackerList = deviceTrackerRepository
-                .findByPersonDeviceTrackerIdPersonAndCreatedAtDeviceTrackerBetween(
+    public Page<DeviceTrackerDto> getDeviceTrackerByDateInterval(DeviceTrackerPeriodRequestDto requestDto, Pageable pageable) {
+        Page<DeviceTracker> deviceTrackerPage = deviceTrackerRepository
+                .findByPersonDeviceTrackerIdPersonAndCreatedAtDeviceTrackerBetweenOrderByCreatedAtDeviceTracker(
                         requestDto.getPersonId(),
                         requestDto.getInit(),
-                        requestDto.getEnd());
-        if (deviceTrackerList.isEmpty()) {
+                        requestDto.getEnd(),
+                        pageable
+                );
+        if (deviceTrackerPage.isEmpty()) {
             throw new NoSuchElementException("No data available for the requested period.");
         } else {
-            List<DeviceTrackerDto> dtoList = new ArrayList<>();
-            for (DeviceTracker deviceTracker : deviceTrackerList.get()) {
-                dtoList.add(this.dtoConverter(deviceTracker));
-            }
-            return dtoList;
+            return deviceTrackerPage.map(this::dtoConverter);
         }
     }
 
