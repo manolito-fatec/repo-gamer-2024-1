@@ -87,5 +87,4 @@ class PersonServiceImplTest {
         BDDMockito.given(repository.findById(1l)).willReturn(Optional.of(person));
         assertEquals(personUpdatedDto.codeDevice(), personService.updatePerson(personUpdatedDto).getCodeDevice());
     }
-
 }
