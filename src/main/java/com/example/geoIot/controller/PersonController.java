@@ -5,6 +5,7 @@ import com.example.geoIot.entity.dto.MsgDeleteDto;
 import com.example.geoIot.entity.dto.RegisterPersonDto;
 import com.example.geoIot.entity.dto.UpdatedPersonDto;
 import com.example.geoIot.repository.PersonRepository;
+import com.example.geoIot.service.device.DeviceTrackerRedisService;
 import com.example.geoIot.service.person.PersonService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,6 +26,9 @@ public class PersonController {
     @Autowired
     private PersonService personService;
 
+    @Autowired
+    private DeviceTrackerRedisService deviceTrackerRedisService;
+
     @PostMapping
     @Operation(summary = "Registrar uma nova pessoa", description = "Adiciona uma nova pessoa ao sistema com as informações fornecidas.")
     @ApiResponses(value = {
@@ -37,6 +41,7 @@ public class PersonController {
     public ResponseEntity<Person> addPerson(@RequestBody RegisterPersonDto pPerson){
          Person newPerson = new Person(pPerson);
          this.personService.savePerson(newPerson);
+         this.deviceTrackerRedisService.onEvent();
          return ResponseEntity.status(201).body(newPerson);
     }
 
@@ -77,6 +82,7 @@ public class PersonController {
     })
     public ResponseEntity<Person> updatePerson(@RequestBody UpdatedPersonDto pPerson){
         Person person = this.personService.updatePerson(pPerson);
+        this.deviceTrackerRedisService.onEvent();
         return ResponseEntity.status(200).body(person);
     }
 
@@ -91,6 +97,7 @@ public class PersonController {
     })
     public ResponseEntity<MsgDeleteDto> deletePerson(@PathVariable Long pId){
         this.personService.deletePerson(pId);
+        this.deviceTrackerRedisService.onEvent();
         MsgDeleteDto msg = new MsgDeleteDto("Person deleted successfully");
         return ResponseEntity.status(200).body(msg);
     }
