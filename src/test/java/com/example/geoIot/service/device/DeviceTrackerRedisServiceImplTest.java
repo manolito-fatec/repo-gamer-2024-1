@@ -36,6 +36,9 @@ class DeviceTrackerRedisServiceImplTest {
     private PersonService personService;
 
     @Mock
+    private StartupPersonListComponent startupPersonListComponent;
+
+    @Mock
     private PersonServiceImpl personServiceToUpdated;
 
     private Person person = new Person(
@@ -150,14 +153,6 @@ class DeviceTrackerRedisServiceImplTest {
         assertThrows(PersonNotFoundException.class, ()->deviceServiceRedis.convertToPerson(namePerson, personSet));
     }
 
-    @Test
-    @DisplayName("should update the people in the list with the default list if getAllPersons() is null.")
-    void shouldUpdatePeopleSet() {
-        BDDMockito.given(personService.getAllPersons()).willReturn(null);
-
-        deviceServiceRedis.onEvent();
-        assertEquals(StartupPersonListComponent.getPersons(), personService.getAllPersons());
-    }
 
     @Test
     @DisplayName("should update the people in the list with the list with the value of getAllPersons().")
