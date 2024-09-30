@@ -35,8 +35,6 @@ class DeviceTrackerRedisServiceImplTest {
     @Mock
     private PersonService personService;
 
-    @Mock
-    private StartupPersonListComponent startupPersonListComponent;
 
     @Mock
     private PersonServiceImpl personServiceToUpdated;
