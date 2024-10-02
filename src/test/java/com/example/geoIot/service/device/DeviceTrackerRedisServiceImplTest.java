@@ -1,6 +1,5 @@
 package com.example.geoIot.service.device;
 
-import com.example.geoIot.component.personList.StartupPersonListComponent;
 import com.example.geoIot.entity.DeviceTracker;
 import com.example.geoIot.entity.DeviceTrackerRedis;
 import com.example.geoIot.entity.Person;

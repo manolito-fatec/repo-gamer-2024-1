@@ -1,6 +1,5 @@
 package com.example.geoIot.service.device;
 
-import com.example.geoIot.component.personList.StartupPersonListComponent;
 import com.example.geoIot.entity.Person;
 import com.example.geoIot.exception.EmptyDataListInRedisException;
 import com.example.geoIot.entity.DeviceTracker;
@@ -9,6 +8,7 @@ import com.example.geoIot.entity.dto.DeviceTrackerRedisDto;
 import com.example.geoIot.exception.PersonNotFoundException;
 import com.example.geoIot.repository.DeviceTrackerRedisRepository;
 import com.example.geoIot.service.person.PersonService;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @EnableScheduling
 public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService{
 
-    private final long MINUTES = 1000 * 60 *5;
+    private final long MINUTES = 1000 * 60;
 
     @Autowired
     private DeviceTrackerRedisRepository deviceTrackerRedisRepository;
@@ -42,22 +42,22 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService{
     @Getter
     private  Set<Person> personSet;
 
+    @PostConstruct
+    public void setPersonInit(){
+        this.personSet = personService.getAllPersons();
+    }
 
     @Override
     public void saveDataInCache(List<DeviceTrackerRedisDto> pDeviceTrackerRedis) {
         if (pDeviceTrackerRedis.isEmpty()) {
             throw new EmptyDataListInRedisException();
         }
-        if(this.personSet == null){
-            this.personSet = StartupPersonListComponent.getPersons();
-        }
         List<DeviceTrackerRedis> listConverted = this.convertToDeviceTrackerListRedis(pDeviceTrackerRedis,personSet);
         deviceTrackerRedisRepository.saveAll(listConverted);
-        this.synchronizeDataBase();
     }
 
     @Override
-    @Scheduled(fixedDelay = MINUTES)
+    @Scheduled(fixedDelay = 5 * MINUTES)
     public void synchronizeDataBase() {
        List<DeviceTrackerRedis> deviceTrackerRedisList = this.findAllInRedis();
        if(!(deviceTrackerRedisList == null) || !(deviceTrackerRedisList.isEmpty())){
@@ -114,7 +114,7 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService{
     public void onEvent() {
         this.personSet = (personService.getAllPersons() != null)
                 ? personService.getAllPersons()
-                : StartupPersonListComponent.getPersons();
+                : this.personSet;
     }
 
 }
