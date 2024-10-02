@@ -8,6 +8,7 @@ import com.example.geoIot.exception.EmptyDataListInRedisException;
 import com.example.geoIot.exception.PersonNotFoundException;
 import com.example.geoIot.service.person.PersonService;
 
+import com.example.geoIot.service.person.PersonServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,12 +25,18 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+
 @ExtendWith(MockitoExtension.class)
 class DeviceTrackerRedisServiceImplTest {
     @InjectMocks
     private DeviceTrackerRedisServiceImpl deviceServiceRedis;
     @Mock
     private PersonService personService;
+
+
+    @Mock
+    private PersonServiceImpl personServiceToUpdated;
 
     private Person person = new Person(
             1l,
@@ -88,8 +95,6 @@ class DeviceTrackerRedisServiceImplTest {
     );
 
 
-
-
     @Test
     @DisplayName("should throw the EmptyDataListInRedisException exception")
     void shouldThrowEmptyDataListInRedisException() {
@@ -143,5 +148,18 @@ class DeviceTrackerRedisServiceImplTest {
         String namePerson = "Bob Esponja";
 
         assertThrows(PersonNotFoundException.class, ()->deviceServiceRedis.convertToPerson(namePerson, personSet));
+    }
+
+
+    @Test
+    @DisplayName("should update the people in the list with the list with the value of getAllPersons().")
+    void shouldUpdatePeopleSetWithValue() {
+        Set<Person> personSet = new HashSet<>();
+        personSet.add(person);
+        personSet.add(person2);
+        BDDMockito.given(personService.getAllPersons()).willReturn(personSet);
+
+        deviceServiceRedis.onEvent();
+        assertEquals(personSet, personService.getAllPersons());
     }
 }

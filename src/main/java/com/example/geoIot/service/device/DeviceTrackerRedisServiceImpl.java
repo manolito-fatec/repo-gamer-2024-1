@@ -8,6 +8,8 @@ import com.example.geoIot.entity.dto.DeviceTrackerRedisDto;
 import com.example.geoIot.exception.PersonNotFoundException;
 import com.example.geoIot.repository.DeviceTrackerRedisRepository;
 import com.example.geoIot.service.person.PersonService;
+import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,14 +18,13 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @EnableScheduling
-public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService {
+public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService{
 
     private final long MINUTES = 1000 * 60;
 
@@ -38,7 +39,13 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService 
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
-    private  Set<Person> personSet = new HashSet<>();
+    @Getter
+    private  Set<Person> personSet;
+
+    @PostConstruct
+    public void setPersonInit(){
+        this.personSet = personService.getAllPersons();
+    }
 
     @Override
     public void saveDataInCache(List<DeviceTrackerRedisDto> pDeviceTrackerRedis) {
@@ -50,11 +57,9 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService 
     }
 
     @Override
-    @Scheduled(fixedDelay = MINUTES)
+    @Scheduled(fixedDelay = 5 * MINUTES)
     public void synchronizeDataBase() {
-        this.personSet = personService.getAllPersons();
-        List<DeviceTrackerRedis> deviceTrackerRedisList = this.findAllInRedis();
-
+       List<DeviceTrackerRedis> deviceTrackerRedisList = this.findAllInRedis();
        if(!(deviceTrackerRedisList == null) || !(deviceTrackerRedisList.isEmpty())){
            List<DeviceTracker> deviceTrackerList = this.convertToDeviceTrackerList(deviceTrackerRedisList);
            this.deviceTrackerService.saveDeviceTracker(deviceTrackerList);
@@ -104,4 +109,12 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService 
                 })
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void onEvent() {
+        this.personSet = (personService.getAllPersons() != null)
+                ? personService.getAllPersons()
+                : this.personSet;
+    }
+
 }

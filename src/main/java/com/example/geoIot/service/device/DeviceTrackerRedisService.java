@@ -9,4 +9,6 @@ public interface DeviceTrackerRedisService{
     void saveDataInCache(List<DeviceTrackerRedisDto> deviceTrackerRedis);
 
     void synchronizeDataBase();
+
+    void onEvent();
 }

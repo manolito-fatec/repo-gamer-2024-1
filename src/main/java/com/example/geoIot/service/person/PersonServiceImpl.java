@@ -5,6 +5,7 @@ import com.example.geoIot.exception.PersonNotFoundException;
 import com.example.geoIot.entity.Person;
 import com.example.geoIot.entity.dto.UpdatedPersonDto;
 import com.example.geoIot.repository.PersonRepository;
+
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,10 +13,9 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
-public class PersonServiceImpl  implements  PersonService{
+public class PersonServiceImpl implements PersonService {
 
     @Autowired
     private PersonRepository personRepository;
