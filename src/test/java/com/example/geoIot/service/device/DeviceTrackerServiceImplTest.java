@@ -54,24 +54,24 @@ class DeviceTrackerServiceImplTest {
             null,
             "1640966C-BBAC-4A26-8A06-0670296D361C",
             LocalDateTime.now(),
-            new BigDecimal(0.5840530000),
-            new BigDecimal(-60.4578730000),
+            0.5840530000,
+            -60.4578730000,
             person
     );
     private DeviceTracker deviceTracker2 = new DeviceTracker(
             null,
             "53CA1452-77FF-4B77-94CF-0037B3C00054",
             LocalDateTime.now(),
-            new BigDecimal(0.5840530000),
-            new BigDecimal(-60.4578730000),
+            0.5840530000,
+            -60.4578730000,
             person
     );
     private DeviceTracker deviceTracker3 = new DeviceTracker(
             null,
             "DD287909-46BE-4E8B-A926-0056596288B1",
             LocalDateTime.now(),
-            new BigDecimal(0.5840530000),
-            new BigDecimal(-60.4578730000),
+            0.5840530000,
+            -60.4578730000,
             person
     );
 
@@ -105,8 +105,8 @@ class DeviceTrackerServiceImplTest {
                 null,
                 "DD287909-46BE-4E8B-A926-0056596288B1",
                 null,
-                new BigDecimal(0.5840530000),
-                new BigDecimal(-60.4578730000),
+                0.5840530000,
+                -60.4578730000,
                 person
         ));
         BDDMockito.given(personRepository.findByFullName(person.getFullName())).willReturn(Optional.of(person));

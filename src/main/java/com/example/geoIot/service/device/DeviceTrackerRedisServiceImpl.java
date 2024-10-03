@@ -17,7 +17,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -29,14 +28,6 @@ import java.util.stream.Collectors;
 public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService{
 
     private final long MINUTES = 1000 * 60;
-
-    private final BigDecimal MIN_LATITUDE = BigDecimal.valueOf(-90);
-
-    private final BigDecimal MAX_LATITUDE = BigDecimal.valueOf(90);
-
-    private final BigDecimal MIN_LONGITUDE = BigDecimal.valueOf(-180);
-
-    private final BigDecimal MAX_LONGITUDE = BigDecimal.valueOf(180);
 
     @Autowired
     private DeviceTrackerRedisRepository deviceTrackerRedisRepository;
@@ -87,8 +78,8 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService{
                     DeviceTrackerRedis deviceConvert = new DeviceTrackerRedis();
                     deviceConvert.setIdTextDeviceTracker(deviceTrackerRedisDto.Id());
                     deviceConvert.setCreatedAtDeviceTracker(LocalDateTime.parse(deviceTrackerRedisDto.CreatedAt(), formatter));
-                    deviceConvert.setLatitude(this.latitudeValidate(BigDecimal.valueOf(deviceTrackerRedisDto.Latitude())));
-                    deviceConvert.setLongitude(this.longitudeValidate(BigDecimal.valueOf(deviceTrackerRedisDto.Longitude())));
+                    deviceConvert.setLatitude(this.latitudeValidate(deviceTrackerRedisDto.Latitude()));
+                    deviceConvert.setLongitude(this.longitudeValidate(deviceTrackerRedisDto.Longitude()));
                     deviceConvert.setFullName(this.convertToPerson(deviceTrackerRedisDto.FullName(), pPersonSet));
                     return deviceConvert;
                 })
@@ -127,20 +118,24 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService{
                 : this.personSet;
     }
 
-   protected BigDecimal latitudeValidate(BigDecimal pLatitude){
+   protected Double latitudeValidate(Double pLatitude){
         if(pLatitude == null) {
             throw new RuntimeException("Latitude is null");
         }
-        if (pLatitude.compareTo(MIN_LATITUDE) >= 0 && pLatitude.compareTo(MAX_LATITUDE) <= 0){
+       Double MIN_LATITUDE = -90.0;
+       Double MAX_LATITUDE = 90.0;
+       if (pLatitude.compareTo(MIN_LATITUDE) >= 0 && pLatitude.compareTo(MAX_LATITUDE) <= 0){
             return pLatitude;
         }
         throw new LatitudeValueException();
    }
 
-    protected BigDecimal longitudeValidate(BigDecimal pLongitude){
+    protected Double longitudeValidate(Double pLongitude){
         if(pLongitude == null) {
             throw new RuntimeException("Longitude is null");
         }
+        Double MIN_LONGITUDE =  -180.0;
+        Double MAX_LONGITUDE = 180.0;
         if (pLongitude.compareTo(MIN_LONGITUDE) >= 0 && pLongitude.compareTo(MAX_LONGITUDE) <= 0){
             return pLongitude;
         }

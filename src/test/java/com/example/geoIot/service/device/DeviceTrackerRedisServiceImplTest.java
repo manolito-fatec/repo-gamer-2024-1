@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class DeviceTrackerRedisServiceImplTest {
@@ -83,16 +82,16 @@ class DeviceTrackerRedisServiceImplTest {
     private DeviceTrackerRedis dto3 = new DeviceTrackerRedis(
             "53CA1452-77FF-4B77-94CF-0037B3C00054",
             LocalDateTime.now(),
-            BigDecimal.valueOf(0.5840530000),
-            BigDecimal.valueOf(-60.4578730000),
+            0.5840530000,
+            -60.4578730000,
             person
     );
 
     private DeviceTrackerRedis dto4 = new DeviceTrackerRedis(
             "DD287909-46BE-4E8B-A926-0056596288B1",
             LocalDateTime.now(),
-            BigDecimal.valueOf(0.5840530000),
-            BigDecimal.valueOf(-60.4578730000),
+            0.5840530000,
+            -60.4578730000,
             person
     );
 
@@ -174,21 +173,21 @@ class DeviceTrackerRedisServiceImplTest {
     @Test
     @DisplayName("should throw the LatitudeValueException when the latitude value is less than -90.")
     void shouldThrowLatitudeValueException() {
-        BigDecimal latitudeValue = new BigDecimal(-91);
+        Double latitudeValue = -91.0;
         assertThrows(LatitudeValueException.class, () ->deviceServiceRedis.latitudeValidate(latitudeValue));
     }
 
     @Test
     @DisplayName("should throw the LatitudeValueException when the latitude value is greater than 90.")
     void shouldThrowLatitudeValueExceptionWhenLatitudeValueIsGreaterThen90() {
-        BigDecimal latitudeValue = new BigDecimal(91);
+        Double latitudeValue = 91.0;
         assertThrows(LatitudeValueException.class, () ->deviceServiceRedis.latitudeValidate(latitudeValue));
     }
 
     @Test
     @DisplayName("Should succeed in the latitude validation.")
     void shouldSucceedTheLatitudeValidation() {
-        BigDecimal latitudeValue = new BigDecimal(43);
+        Double latitudeValue = 43.0;
         assertDoesNotThrow(() ->deviceServiceRedis.latitudeValidate(latitudeValue));
     }
 
@@ -201,21 +200,21 @@ class DeviceTrackerRedisServiceImplTest {
     @Test
     @DisplayName("should throw the LongitudeValueException when the latitude value is less than -180.")
     void shouldThrowLongitudeValueException() {
-        BigDecimal longitudeValue = new BigDecimal(-181);
+        Double longitudeValue =-181.0;
         assertThrows(LongitudeValueException.class, () ->deviceServiceRedis.longitudeValidate(longitudeValue));
     }
 
     @Test
     @DisplayName("should throw the LongitudeValueException when the latitude value is greater than 180.")
     void shouldThrowLongitudeValueExceptionWhenLatitudeValueIsGreaterThen181() {
-        BigDecimal longitudeValue = new BigDecimal(181);
+        Double longitudeValue = 181.0;
         assertThrows(LongitudeValueException.class, () ->deviceServiceRedis.longitudeValidate(longitudeValue));
     }
 
     @Test
     @DisplayName("Should succeed in the latitude validation.")
     void shouldSucceedTheLongitudeValidation() {
-        BigDecimal longitudeValue = new BigDecimal(10);
+        Double longitudeValue = 10.0;
         assertDoesNotThrow(() ->deviceServiceRedis.longitudeValidate(longitudeValue));
     }
 }
