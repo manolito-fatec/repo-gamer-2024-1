@@ -5,6 +5,8 @@ import com.example.geoIot.exception.EmptyDataListInRedisException;
 import com.example.geoIot.entity.DeviceTracker;
 import com.example.geoIot.entity.DeviceTrackerRedis;
 import com.example.geoIot.entity.dto.DeviceTrackerRedisDto;
+import com.example.geoIot.exception.LatitudeValueException;
+import com.example.geoIot.exception.LongitudeValueException;
 import com.example.geoIot.exception.PersonNotFoundException;
 import com.example.geoIot.repository.DeviceTrackerRedisRepository;
 import com.example.geoIot.service.person.PersonService;
@@ -27,6 +29,14 @@ import java.util.stream.Collectors;
 public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService{
 
     private final long MINUTES = 1000 * 60;
+
+    private final BigDecimal MIN_LATITUDE = BigDecimal.valueOf(-90);
+
+    private final BigDecimal MAX_LATITUDE = BigDecimal.valueOf(90);
+
+    private final BigDecimal MIN_LONGITUDE = BigDecimal.valueOf(-180);
+
+    private final BigDecimal MAX_LONGITUDE = BigDecimal.valueOf(180);
 
     @Autowired
     private DeviceTrackerRedisRepository deviceTrackerRedisRepository;
@@ -77,8 +87,8 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService{
                     DeviceTrackerRedis deviceConvert = new DeviceTrackerRedis();
                     deviceConvert.setIdTextDeviceTracker(deviceTrackerRedisDto.Id());
                     deviceConvert.setCreatedAtDeviceTracker(LocalDateTime.parse(deviceTrackerRedisDto.CreatedAt(), formatter));
-                    deviceConvert.setLatitude(BigDecimal.valueOf(deviceTrackerRedisDto.Latitude()));
-                    deviceConvert.setLongitude(BigDecimal.valueOf(deviceTrackerRedisDto.Longitude()));
+                    deviceConvert.setLatitude(this.latitudeValidate(BigDecimal.valueOf(deviceTrackerRedisDto.Latitude())));
+                    deviceConvert.setLongitude(this.longitudeValidate(BigDecimal.valueOf(deviceTrackerRedisDto.Longitude())));
                     deviceConvert.setFullName(this.convertToPerson(deviceTrackerRedisDto.FullName(), pPersonSet));
                     return deviceConvert;
                 })
@@ -117,4 +127,23 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService{
                 : this.personSet;
     }
 
+   protected BigDecimal latitudeValidate(BigDecimal pLatitude){
+        if(pLatitude == null) {
+            throw new RuntimeException("Latitude is null");
+        }
+        if (pLatitude.compareTo(MIN_LATITUDE) >= 0 && pLatitude.compareTo(MAX_LATITUDE) <= 0){
+            return pLatitude;
+        }
+        throw new LatitudeValueException();
+   }
+
+    protected BigDecimal longitudeValidate(BigDecimal pLongitude){
+        if(pLongitude == null) {
+            throw new RuntimeException("Longitude is null");
+        }
+        if (pLongitude.compareTo(MIN_LONGITUDE) >= 0 && pLongitude.compareTo(MAX_LONGITUDE) <= 0){
+            return pLongitude;
+        }
+        throw new LongitudeValueException();
+    }
 }
