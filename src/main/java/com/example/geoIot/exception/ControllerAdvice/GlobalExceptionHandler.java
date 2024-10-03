@@ -45,6 +45,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InternalServerErrorException.class) //500
     public ResponseEntity<String> handleInternalServerErrorException(InternalServerErrorException ex) {
         logger.error(ex.getMessage());
-        return new ResponseEntity<>("Erro interno no servidor. Tente novamente mais tarde ou acione o Suporte", HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>("Erro interno no servidor. Tente novamente mais tarde", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
