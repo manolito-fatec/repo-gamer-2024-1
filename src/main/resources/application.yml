@@ -3,8 +3,8 @@ spring:
     name: ito1
   datasource:
     url: jdbc:oracle:thin:@ito_high?TNS_ADMIN=./wallet
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    username: ADMIN
+    password: ManolitoITO1
     driver-class-name: oracle.jdbc.OracleDriver
   jpa:
     hibernate:
