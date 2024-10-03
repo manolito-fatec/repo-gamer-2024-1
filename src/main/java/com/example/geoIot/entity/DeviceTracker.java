@@ -30,9 +30,9 @@ public class DeviceTracker {
     @Column(name = "created_at")
     private LocalDateTime createdAtDeviceTracker;
     @Column(name="latitude")
-    private BigDecimal latitude;
+    private Double latitude;
     @Column(name="longitude")
-    private BigDecimal longitude;
+    private Double longitude;
 
     @ManyToOne
     @JoinColumn(name="id_person")

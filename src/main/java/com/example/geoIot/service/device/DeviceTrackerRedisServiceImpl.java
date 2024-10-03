@@ -5,6 +5,8 @@ import com.example.geoIot.exception.EmptyDataListInRedisException;
 import com.example.geoIot.entity.DeviceTracker;
 import com.example.geoIot.entity.DeviceTrackerRedis;
 import com.example.geoIot.entity.dto.DeviceTrackerRedisDto;
+import com.example.geoIot.exception.LatitudeValueException;
+import com.example.geoIot.exception.LongitudeValueException;
 import com.example.geoIot.exception.PersonNotFoundException;
 import com.example.geoIot.repository.DeviceTrackerRedisRepository;
 import com.example.geoIot.service.person.PersonService;
@@ -15,7 +17,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -77,8 +78,8 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService{
                     DeviceTrackerRedis deviceConvert = new DeviceTrackerRedis();
                     deviceConvert.setIdTextDeviceTracker(deviceTrackerRedisDto.Id());
                     deviceConvert.setCreatedAtDeviceTracker(LocalDateTime.parse(deviceTrackerRedisDto.CreatedAt(), formatter));
-                    deviceConvert.setLatitude(BigDecimal.valueOf(deviceTrackerRedisDto.Latitude()));
-                    deviceConvert.setLongitude(BigDecimal.valueOf(deviceTrackerRedisDto.Longitude()));
+                    deviceConvert.setLatitude(this.latitudeValidate(deviceTrackerRedisDto.Latitude()));
+                    deviceConvert.setLongitude(this.longitudeValidate(deviceTrackerRedisDto.Longitude()));
                     deviceConvert.setFullName(this.convertToPerson(deviceTrackerRedisDto.FullName(), pPersonSet));
                     return deviceConvert;
                 })
@@ -117,4 +118,27 @@ public class DeviceTrackerRedisServiceImpl implements DeviceTrackerRedisService{
                 : this.personSet;
     }
 
+   protected Double latitudeValidate(Double pLatitude){
+        if(pLatitude == null) {
+            throw new RuntimeException("Latitude is null");
+        }
+       Double MIN_LATITUDE = -90.0;
+       Double MAX_LATITUDE = 90.0;
+       if (pLatitude.compareTo(MIN_LATITUDE) >= 0 && pLatitude.compareTo(MAX_LATITUDE) <= 0){
+            return pLatitude;
+        }
+        throw new LatitudeValueException();
+   }
+
+    protected Double longitudeValidate(Double pLongitude){
+        if(pLongitude == null) {
+            throw new RuntimeException("Longitude is null");
+        }
+        Double MIN_LONGITUDE =  -180.0;
+        Double MAX_LONGITUDE = 180.0;
+        if (pLongitude.compareTo(MIN_LONGITUDE) >= 0 && pLongitude.compareTo(MAX_LONGITUDE) <= 0){
+            return pLongitude;
+        }
+        throw new LongitudeValueException();
+    }
 }

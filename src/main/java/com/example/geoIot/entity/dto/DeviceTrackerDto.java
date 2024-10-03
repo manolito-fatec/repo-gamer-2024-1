@@ -14,6 +14,6 @@ public class DeviceTrackerDto {
     Long id;
     String itoId;
     LocalDateTime createdAt;
-    BigDecimal latitude;
-    BigDecimal longitude;
+    Double latitude;
+    Double longitude;
 }

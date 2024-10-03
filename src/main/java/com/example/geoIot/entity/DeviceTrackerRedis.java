@@ -23,7 +23,7 @@ public class DeviceTrackerRedis implements Serializable{
     @Indexed
     private String idTextDeviceTracker;
     private LocalDateTime createdAtDeviceTracker;
-    private BigDecimal latitude;
-    private BigDecimal longitude;
+    private Double latitude;
+    private Double longitude;
     private Person fullName;
 }
