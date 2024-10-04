@@ -2,6 +2,9 @@ package com.example.geoIot.controller;
 
 import com.example.geoIot.entity.dto.DeviceTrackerDto;
 import com.example.geoIot.entity.dto.DeviceTrackerPeriodRequestDto;
+import com.example.geoIot.exception.ControllerAdvice.InternalServerErrorException;
+import com.example.geoIot.exception.ControllerAdvice.InvalidRequestException;
+import com.example.geoIot.exception.ControllerAdvice.ResourceNotFoundException;
 import com.example.geoIot.service.device.DeviceTrackerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.NoSuchElementException;
 
 @Tag(name = "Consulta - Controller", description = "Endpoints para consultar dispositivos e pessoas por período")
@@ -48,13 +52,15 @@ public class DeviceTrackerController {
                     .init(init)
                     .end(end)
                     .build();
-            Pageable pageable = PageRequest.of(page,size);
+            Pageable pageable = PageRequest.of(page, size);
             Page<DeviceTrackerDto> dtoPage = service.getDeviceTrackerByDateInterval(requestDto, pageable);
             return ResponseEntity.ok(dtoPage);
-        } catch (NoSuchElementException noSuchElementException) {
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        } catch (DateTimeParseException ex) {
+            throw new InvalidRequestException(ex.getMessage());
+        } catch (NoSuchElementException ex) {
+            throw new ResourceNotFoundException(ex.getMessage());
+        } catch (Exception ex) {
+            throw new InternalServerErrorException(ex.getMessage());
         }
     }
 }
