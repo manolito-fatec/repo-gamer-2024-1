@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import oracle.spatial.geometry.JGeometry;
+
+import java.awt.*;
 
 @Getter
 @Setter
@@ -21,5 +22,5 @@ public class Location {
     @Column(name = "name")
     private String name;
     @Column(name = "poly")
-    private JGeometry poly;
+    private Polygon poly;
 }

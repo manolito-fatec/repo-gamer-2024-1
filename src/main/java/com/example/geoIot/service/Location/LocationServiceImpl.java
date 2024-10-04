@@ -35,9 +35,6 @@ public class LocationServiceImpl implements LocationService {
         Location location = new Location();
         location.setName(name);
 
-        JGeometry geometry = JGeometry.createLinearPolygon(polyCoords, DIMENSIONS,SRID);
-        location.setPoly(geometry);
-
         return locationRepository.save(location);
 
     }
