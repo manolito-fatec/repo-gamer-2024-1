@@ -1,7 +1,6 @@
-package com.example.geoIot.service.Location;
+package com.example.geoIot.service.location;
 
 import com.example.geoIot.entity.Location;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface LocationService {
     Location getLocation(Long id);

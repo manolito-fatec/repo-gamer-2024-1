@@ -1,12 +1,15 @@
-package com.example.geoIot.service.Location;
+package com.example.geoIot.service.location;
 
 import com.example.geoIot.entity.Location;
 import com.example.geoIot.repository.LocationRepository;
 import oracle.spatial.geometry.JGeometry;
+import org.locationtech.jts.geom.Coordinate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -34,6 +37,11 @@ public class LocationServiceImpl implements LocationService {
     public Location saveLocation(String name, double[][] polyCoords) {
         Location location = new Location();
         location.setName(name);
+
+        List<Coordinate> coords = new ArrayList<>();
+        coords.add
+
+
 
         return locationRepository.save(location);
 
