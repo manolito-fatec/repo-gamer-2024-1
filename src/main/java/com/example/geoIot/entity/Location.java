@@ -16,7 +16,7 @@ import oracle.spatial.geometry.JGeometry;
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name ="id_person")
+    @Column(name ="id_location")
     private Long idLocation;
     @Column(name = "name")
     private String name;
