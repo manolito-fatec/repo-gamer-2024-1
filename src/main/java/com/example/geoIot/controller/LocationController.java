@@ -3,7 +3,6 @@ package com.example.geoIot.controller;
 import com.example.geoIot.entity.dto.LocationDto;
 import com.example.geoIot.entity.dto.PolygonSaveDto;
 import com.example.geoIot.service.location.LocationService;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
