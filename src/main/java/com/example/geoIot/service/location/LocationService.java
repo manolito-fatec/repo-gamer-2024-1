@@ -1,8 +1,9 @@
 package com.example.geoIot.service.location;
 
-import com.example.geoIot.entity.Location;
+import com.example.geoIot.entity.dto.LocationDto;
+import com.example.geoIot.entity.dto.PolygonSaveDto;
 
 public interface LocationService {
-    Location getLocation(Long id);
-    Location saveLocation(String name, double[][] polyCoords);
+    LocationDto getLocation(Long id);
+    LocationDto saveLocation(PolygonSaveDto polygonSaveDto);
 }
