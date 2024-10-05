@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.awt.*;
+import org.locationtech.jts.geom.Polygon;
 
 @Getter
 @Setter
@@ -21,6 +21,7 @@ public class Location {
     private Long idLocation;
     @Column(name = "name")
     private String name;
-    @Column(name = "poly")
-    private Polygon poly;
+    @Column(name = "poly", columnDefinition = "SDO_GEOMETRY")
+    private Polygon polygon;
+
 }
