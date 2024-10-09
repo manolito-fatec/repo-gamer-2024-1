@@ -2,6 +2,7 @@ package com.example.geoIot.controller;
 
 import com.example.geoIot.entity.dto.LocationDto;
 import com.example.geoIot.entity.dto.PolygonSaveDto;
+import com.example.geoIot.exception.OpenPolygonException;
 import com.example.geoIot.service.location.LocationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -84,6 +85,8 @@ public class LocationController {
         try {
             LocationDto createdLocation = service.saveLocation(saveDto);
             return ResponseEntity.status(201).body(createdLocation);
+        } catch (OpenPolygonException e) {
+            return ResponseEntity.badRequest().body("Bad Request: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Bad Request: " + e.getMessage());
         }

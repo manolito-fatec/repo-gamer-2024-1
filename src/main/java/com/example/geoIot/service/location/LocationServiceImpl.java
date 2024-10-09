@@ -5,6 +5,7 @@ import com.example.geoIot.entity.dto.CoordinateDto;
 
 import com.example.geoIot.entity.dto.LocationDto;
 import com.example.geoIot.entity.dto.PolygonSaveDto;
+import com.example.geoIot.exception.OpenPolygonException;
 import com.example.geoIot.repository.LocationRepository;
 import com.example.geoIot.util.CoordinateValidator;
 import org.locationtech.jts.geom.Coordinate;
@@ -55,6 +56,9 @@ public class LocationServiceImpl implements LocationService {
     @Transactional
     @Override
     public LocationDto saveLocation(PolygonSaveDto polygonSaveDto) {
+        if (polygonSaveDto.getCoordinates().getFirst() != polygonSaveDto.getCoordinates().getLast()) {
+            throw new OpenPolygonException();
+        }
         Location location = new Location();
         location.setName(polygonSaveDto.getName());
 
