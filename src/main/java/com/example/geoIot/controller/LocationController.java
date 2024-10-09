@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Tag(name = "Local - Controller", description = "Endpoints para criar e consultar poligonos de localizações")
@@ -38,6 +39,28 @@ public class LocationController {
         try {
             LocationDto locationDto = service.getLocation(id);
             return ResponseEntity.ok().body(locationDto);
+        } catch (NoSuchElementException noSuchElementException) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return ResponseEntity.badRequest().build();
+        } catch (RuntimeException runtimeException) {
+            return ResponseEntity.internalServerError().body("Internal Server Error" + runtimeException.getMessage());
+        }
+    }
+
+    @GetMapping("get-all-polygons")
+    @Operation(summary = "Busca de todos os polígonos de locais", description = "Faz uma requisição ao OracleCloud trazendo todos os dados de polígonos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Todos os polígonos encontrados com sucesso."),
+            @ApiResponse(responseCode = "400", description = "Requisição mal formulada."),
+            @ApiResponse(responseCode = "404", description = "Nenhum polígono existe."),
+            @ApiResponse(responseCode = "408", description = "Tempo de resposta excedido."),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor ao tentar buscar os locais.")
+    })
+    public ResponseEntity<?> getAllPolygons() {
+        try {
+            List<LocationDto> locationDtoList = service.getAllLocations();
+            return ResponseEntity.ok().body(locationDtoList);
         } catch (NoSuchElementException noSuchElementException) {
             return ResponseEntity.notFound().build();
         } catch (IllegalArgumentException illegalArgumentException) {

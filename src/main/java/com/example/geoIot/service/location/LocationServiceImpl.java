@@ -9,6 +9,7 @@ import com.example.geoIot.repository.LocationRepository;
 import com.example.geoIot.util.CoordinateValidator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,9 @@ public class LocationServiceImpl implements LocationService {
     @Autowired
     private LocationRepository locationRepository;
 
+    @Autowired
+    ModelMapper modelMapper;
+
     private CoordinateValidator coordinateValidator;
 
     @Transactional
@@ -38,6 +42,17 @@ public class LocationServiceImpl implements LocationService {
                 .name(location.get().getName())
                 .polygon(location.get().getPolygon())
                 .build();
+    }
+
+    @Override
+    public List<LocationDto> getAllLocations() {
+        List<Location> locationList = locationRepository.findAll();
+        if (locationList.isEmpty()) {
+            throw new NoSuchElementException("No locations exist yet");
+        }
+        return locationList.stream()
+                .map(this::convertToDTO)
+                .toList();
     }
 
     @Transactional
@@ -66,5 +81,9 @@ public class LocationServiceImpl implements LocationService {
                 .polygon(savedLocation.getPolygon())
                 .build();
 
+    }
+
+    private LocationDto convertToDTO(Location location) {
+        return modelMapper.map(location, LocationDto.class);
     }
 }
