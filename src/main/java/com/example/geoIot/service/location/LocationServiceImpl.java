@@ -56,7 +56,7 @@ public class LocationServiceImpl implements LocationService {
     @Transactional
     @Override
     public LocationDto saveLocation(PolygonSaveDto polygonSaveDto) {
-        if (polygonSaveDto.getCoordinates().getFirst() != polygonSaveDto.getCoordinates().getLast()) {
+        if (isPolygonOpen(polygonSaveDto)) {
             throw new OpenPolygonException();
         }
         Location location = new Location();
@@ -90,5 +90,16 @@ public class LocationServiceImpl implements LocationService {
                 .name(location.getName())
                 .polygon(location.getPolygon())
                 .build();
+    }
+
+    private boolean isPolygonOpen(PolygonSaveDto saveDto) {
+        int lastIndex = saveDto.getCoordinates().size()-1;
+        if (saveDto.getCoordinates().get(0).getLatitude() != saveDto.getCoordinates().get(lastIndex).getLatitude()
+        || saveDto.getCoordinates().get(0).getLongitude() != saveDto.getCoordinates().get(lastIndex).getLongitude()
+        ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
