@@ -39,20 +39,11 @@ public class PersonController {
             @ApiResponse(responseCode = "408", description = "Tempo de resposta excedido."),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor ao tentar registrar a pessoa.")
     })
-    public ResponseEntity<Person> addPerson(@RequestBody RegisterPersonDto pPerson) {
-        try {
-            Person newPerson = new Person(pPerson);
-            this.personService.savePerson(newPerson);
-            this.deviceTrackerRedisService.onEvent();
-            return ResponseEntity.status(201).body(newPerson);
-        } catch (InvalidInputException ex) {
-            throw new InvalidInputException(ex.getMessage());
-        } catch (RequestTimeoutException ex) {
-            throw new RequestTimeoutException(ex.getMessage());
-        } catch (Exception ex) {
-            throw new InternalServerErrorException(ex.getMessage());
-        }
-
+    public ResponseEntity<Person> addPerson(@RequestBody RegisterPersonDto pPerson) throws InvalidInputException, RequestTimeoutException, InternalServerErrorException {
+        Person newPerson = new Person(pPerson);
+        this.personService.savePerson(newPerson);
+        this.deviceTrackerRedisService.onEvent();
+        return ResponseEntity.status(201).body(newPerson);
     }
 
     @GetMapping
@@ -63,17 +54,9 @@ public class PersonController {
             @ApiResponse(responseCode = "408", description = "Tempo de resposta excedido."),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor ao tentar buscar a pessoa.")
     })
-    public ResponseEntity<Set<Person>> getAllPersons() {
-        try {
-            Set<Person> persons = this.personService.getAllPersons();
-            return ResponseEntity.status(200).body(persons);
-        } catch (NoDataFoundException ex) {
-            throw new NoDataFoundException(ex.getMessage());
-        } catch (RequestTimeoutException ex) {
-            throw new RequestTimeoutException(ex.getMessage());
-        } catch (Exception ex) {
-            throw new InternalServerErrorException(ex.getMessage());
-        }
+    public ResponseEntity<Set<Person>> getAllPersons() throws NoDataFoundException, RequestTimeoutException, InternalServerErrorException {
+        Set<Person> persons = this.personService.getAllPersons();
+        return ResponseEntity.status(200).body(persons);
     }
 
     @GetMapping("/{id}")
@@ -84,19 +67,9 @@ public class PersonController {
             @ApiResponse(responseCode = "408", description = "Tempo de resposta excedido."),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor ao tentar buscar a pessoa.")
     })
-    public ResponseEntity<Person> getPersonById(@PathVariable Long pId) {
-        try {
-            Person person = this.personService.getPersonById(pId);
-            return ResponseEntity.status(200).body(person);
-        } catch (NoDataFoundException ex) {
-            throw new NoDataFoundException(ex.getMessage());
-        } catch (RequestTimeoutException ex) {
-            throw new RequestTimeoutException(ex.getMessage());
-        } catch (Exception ex) {
-            throw new InternalServerErrorException(ex.getMessage());
-        } catch (Throwable ex) {
-            throw new NullPointerException(ex.getMessage());
-        }
+    public ResponseEntity<Person> getPersonById(@PathVariable Long pId) throws NoDataFoundException, RequestTimeoutException, InternalServerErrorException, NullPointerException {
+        Person person = this.personService.getPersonById(pId);
+        return ResponseEntity.status(200).body(person);
     }
 
     @PutMapping
@@ -108,20 +81,10 @@ public class PersonController {
             @ApiResponse(responseCode = "408", description = "Tempo de resposta excedido."),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor ao tentar atualizar a pessoa.")
     })
-    public ResponseEntity<Person> updatePerson(@RequestBody UpdatedPersonDto pPerson) {
-        try {
-            Person person = this.personService.updatePerson(pPerson);
-            this.deviceTrackerRedisService.onEvent();
-            return ResponseEntity.status(200).body(person);
-        } catch (InvalidInputException ex) {
-            throw new InvalidInputException(ex.getMessage());
-        } catch (NoDataFoundException ex) {
-            throw new NoDataFoundException(ex.getMessage());
-        } catch (RequestTimeoutException ex) {
-            throw new RequestTimeoutException(ex.getMessage());
-        } catch (Exception ex) {
-            throw new InternalServerErrorException(ex.getMessage());
-        }
+    public ResponseEntity<Person> updatePerson(@RequestBody UpdatedPersonDto pPerson) throws InvalidInputException, NoDataFoundException, RequestTimeoutException, InternalServerErrorException {
+        Person person = this.personService.updatePerson(pPerson);
+        this.deviceTrackerRedisService.onEvent();
+        return ResponseEntity.status(200).body(person);
     }
 
 
@@ -133,18 +96,10 @@ public class PersonController {
             @ApiResponse(responseCode = "408", description = "Tempo de resposta excedido."),
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor ao tentar deletar a pessoa.")
     })
-    public ResponseEntity<MsgDeleteDto> deletePerson(@PathVariable Long pId) {
-        try {
-            this.personService.deletePerson(pId);
-            this.deviceTrackerRedisService.onEvent();
-            MsgDeleteDto msg = new MsgDeleteDto("Person deleted successfully");
-            return ResponseEntity.status(200).body(msg);
-        } catch (NoDataFoundException ex) {
-            throw new NoDataFoundException(ex.getMessage());
-        } catch (RequestTimeoutException ex) {
-            throw new RequestTimeoutException(ex.getMessage());
-        } catch (Exception ex) {
-            throw new InternalServerErrorException(ex.getMessage());
-        }
+    public ResponseEntity<MsgDeleteDto> deletePerson(@PathVariable Long pId) throws NoDataFoundException, RequestTimeoutException, InternalServerErrorException {
+        this.personService.deletePerson(pId);
+        this.deviceTrackerRedisService.onEvent();
+        MsgDeleteDto msg = new MsgDeleteDto("Person deleted successfully");
+        return ResponseEntity.status(200).body(msg);
     }
 }

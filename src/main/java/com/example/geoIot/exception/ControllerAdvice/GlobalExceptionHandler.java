@@ -14,6 +14,17 @@ public class GlobalExceptionHandler {
 
     Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(MethodArgumentTypeException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(NullPointerException ex, HttpServletRequest request) {
+        logger.error(ex.getMessage(), ex);
+        ErrorResponse errorResponse = new ErrorResponse(
+                "Parâmetro inválido. Verifique o formato dos dados fornecidos",
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                request.getRequestURI());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(InvalidRequestException.class)
     public ResponseEntity<ErrorResponse> handleInvalidRequestException(InvalidRequestException ex, HttpServletRequest request) {
         logger.error(ex.getMessage(), ex);
