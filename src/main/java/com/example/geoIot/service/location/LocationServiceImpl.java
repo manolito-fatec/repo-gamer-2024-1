@@ -25,9 +25,6 @@ public class LocationServiceImpl implements LocationService {
     @Autowired
     private LocationRepository locationRepository;
 
-    @Autowired
-    ModelMapper modelMapper;
-
     private CoordinateValidator coordinateValidator;
 
     @Transactional
@@ -84,6 +81,10 @@ public class LocationServiceImpl implements LocationService {
     }
 
     private LocationDto convertToDTO(Location location) {
-        return modelMapper.map(location, LocationDto.class);
+        return LocationDto.builder()
+                .idLocation(location.getIdLocation())
+                .name(location.getName())
+                .polygon(location.getPolygon())
+                .build();
     }
 }
