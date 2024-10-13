@@ -1,4 +1,4 @@
-package com.example.geoIot.entity.dto;
+package com.example.geoIot.entity.dto.history;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
