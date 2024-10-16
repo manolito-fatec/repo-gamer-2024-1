@@ -59,7 +59,7 @@ public class PersonController {
         return ResponseEntity.status(200).body(persons);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{pId}")
     @Operation(summary = "Buscar pessoa por ID", description = "Recupera os dados de uma pessoa específica usando o ID fornecido.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Pessoa encontrada com sucesso."),

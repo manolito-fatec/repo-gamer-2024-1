@@ -2,6 +2,8 @@ package com.example.geoIot.service.device;
 
 import com.example.geoIot.entity.dto.DeviceTrackerDto;
 import com.example.geoIot.entity.dto.DeviceTrackerPeriodRequestDto;
+import com.example.geoIot.entity.dto.history.HistoryDto;
+import com.example.geoIot.entity.dto.history.LocationDto;
 import com.example.geoIot.exception.PersonNotFoundException;
 import com.example.geoIot.entity.DeviceTracker;
 import com.example.geoIot.entity.Person;
@@ -20,12 +22,11 @@ import org.mockito.quality.Strictness;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.client.RestClient;
 
-import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -61,17 +62,35 @@ class DeviceTrackerServiceImplTest {
     private DeviceTracker deviceTracker2 = new DeviceTracker(
             null,
             "53CA1452-77FF-4B77-94CF-0037B3C00054",
-            LocalDateTime.now(),
+            LocalDateTime.now().plusMinutes(13),
             0.5840530000,
-            -60.4578730000,
+            -60.4578731000,
             person
     );
     private DeviceTracker deviceTracker3 = new DeviceTracker(
             null,
             "DD287909-46BE-4E8B-A926-0056596288B1",
-            LocalDateTime.now(),
+            LocalDateTime.now().plusMinutes(30),
             0.5840530000,
-            -60.4578730000,
+            -60.4578732000,
+            person
+    );
+
+    private DeviceTracker deviceTracker4 =  new DeviceTracker(
+            1l,
+            "Fatec address.",
+            LocalDateTime.now(),
+            -23.1624687,
+            -45.7946497,
+            person
+    );
+
+    private DeviceTracker deviceTracker5 =  new DeviceTracker(
+            1l,
+            "DD287909-46BE-4E8B-A926-0056596288B2",
+            LocalDateTime.now().plusMinutes(16),
+            -23.1623982,
+            -45.7947135,
             person
     );
 
@@ -147,4 +166,38 @@ class DeviceTrackerServiceImplTest {
         assertEquals(deviceTracker1.getLatitude(), deviceTrackerDto.getLatitude());
         assertEquals(deviceTracker1.getLongitude(), deviceTrackerDto.getLongitude());
     }
+
+    @Test
+    @DisplayName("Should return a List  of History entries between the given dates")
+    void getDeviceHistoryByPeriod(){
+        List<DeviceTracker> listOfDeviceTrackersToHistory = new ArrayList<>();
+        listOfDeviceTrackersToHistory.add(deviceTracker4);
+        listOfDeviceTrackersToHistory.add(deviceTracker5);
+        assertFalse(deviceService.generateHistoryDto(listOfDeviceTrackersToHistory).isEmpty());
+    }
+
+    @Test
+    @DisplayName("should perform a calculation and return a value.")
+    void calculateLatitudeAndLongitude(){
+        assertEquals(10.197810919275682, deviceService.calculateDistance(deviceTracker4,deviceTracker5));
+    }
+
+    @Test
+    @DisplayName("should check if the time is greater than 15 minutes and the distance between the points is greater than 10 meters.")
+    void isStop(){
+        assertEquals(true,deviceService.isStop(deviceTracker4,deviceTracker5));
+    }
+
+    @Test
+    @DisplayName("shouldn't be a stop because the time variation is less than 15 minutes")
+    void notStop(){
+        assertEquals(false,deviceService.isStop(deviceTracker1,deviceTracker2));
+    }
+
+    @Test
+    @DisplayName("I should return data from an address.")
+    void getAddress(){
+        assertEquals("FATEC - SJC", deviceService.getAddress(deviceTracker4.getLatitude(), deviceTracker4.getLongitude()).getName());
+    }
+
 }
