@@ -79,7 +79,7 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
         return new PageImpl<>(historic, pageable, historic.size());
     }
 
-    private List<HistoryDto> generateHistoryDto(List<DeviceTracker> pDeviceTrackers) {
+    protected List<HistoryDto> generateHistoryDto(List<DeviceTracker> pDeviceTrackers) {
         Queue<DeviceTracker> queueOfStartTracker = new LinkedList<>(pDeviceTrackers);
         DeviceTracker firstPoint = queueOfStartTracker.poll();
         List<HistoryDto> historic = new ArrayList<>();
@@ -99,14 +99,14 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
         return historic;
     }
 
-    private Boolean isStop(DeviceTracker pFirstPoint, DeviceTracker pPointTracker) {
+    protected Boolean isStop(DeviceTracker pFirstPoint, DeviceTracker pPointTracker) {
         Duration duration = Duration.between(pFirstPoint.getCreatedAtDeviceTracker(), pPointTracker.getCreatedAtDeviceTracker());
         Long timeElapsed = duration.toMinutes();
         Double distance = calculateDistance(pFirstPoint, pPointTracker);
         return timeElapsed > TIME_THRESHOLD_MINUTES && distance >= DISTANCE_THRESHOLD;
     }
 
-    private Double calculateDistance(DeviceTracker pFirstPoint, DeviceTracker pSecondPoint) {
+    protected Double calculateDistance(DeviceTracker pFirstPoint, DeviceTracker pSecondPoint) {
         Double lat1 = Math.toRadians(pFirstPoint.getLatitude());
         Double lon1 = Math.toRadians(pFirstPoint.getLongitude());
         Double lat2 = Math.toRadians(pSecondPoint.getLatitude());
@@ -123,7 +123,7 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
         return EARTH_RADIUS * c;
     }
 
-    private LocationDto getAddress(Double pLatitude, Double pLongitude){
+    protected LocationDto getAddress(Double pLatitude, Double pLongitude){
         RestClient restClient = RestClient.create();
         return restClient.get()
                 .uri(BASEURL +"/reverse?lat={lat}&lon={lon}&accept-language=pt_br&format=json", pLatitude, pLongitude)
