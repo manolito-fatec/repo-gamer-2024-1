@@ -49,7 +49,7 @@ public class LocationController {
         }
     }
 
-    @GetMapping("get-all-polygons")
+    @GetMapping("/get-all-polygons")
     @Operation(summary = "Busca de todos os polígonos de locais", description = "Faz uma requisição ao OracleCloud trazendo todos os dados de polígonos")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Todos os polígonos encontrados com sucesso."),
