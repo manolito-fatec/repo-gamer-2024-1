@@ -25,7 +25,7 @@ public class LocationController {
     @Autowired
     private LocationService service;
 
-    @GetMapping("get-polygon")
+    @GetMapping("/get-polygon")
     @Operation(summary = "Busca de um polígono de local", description = "Faz uma requisição ao OracleCloud trazendo os dados de um polígono")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Polígono encontrado com sucesso."),
