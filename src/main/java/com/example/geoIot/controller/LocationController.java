@@ -80,7 +80,7 @@ public class LocationController {
     })
     @PostMapping("/save-polygon")
     public ResponseEntity<?> savePolygon(
-            @Parameter(description = "Nome e Lista de coordenadas que delimitam o poligono",required = true) @RequestParam PolygonSaveDto saveDto
+            @Parameter(description = "Nome e Lista de coordenadas que delimitam o poligono",required = true) @RequestBody PolygonSaveDto saveDto
     ) {
         try {
             LocationDto createdLocation = service.saveLocation(saveDto);
