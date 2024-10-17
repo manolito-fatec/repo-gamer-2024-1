@@ -10,7 +10,7 @@ import com.example.geoIot.repository.LocationRepository;
 import com.example.geoIot.util.CoordinateValidator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.modelmapper.ModelMapper;
+import org.locationtech.jts.geom.Polygon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +39,7 @@ public class LocationServiceImpl implements LocationService {
         return LocationDto.builder()
                 .idLocation(location.get().getIdLocation())
                 .name(location.get().getName())
-                .polygon(location.get().getPolygon())
+                .coordinates(convertPolygonToCoordinateList(location.get().getPolygon()))
                 .build();
     }
 
@@ -77,20 +77,30 @@ public class LocationServiceImpl implements LocationService {
         location.setPolygon(geometry.createPolygon((coords.toArray(new Coordinate[0]))));
 
         Location savedLocation = locationRepository.save(location);
+
         return LocationDto.builder()
                 .idLocation(savedLocation.getIdLocation())
                 .name(savedLocation.getName())
-                .polygon(savedLocation.getPolygon())
+                .coordinates(convertPolygonToCoordinateList(savedLocation.getPolygon()))
                 .build();
 
     }
 
     private LocationDto convertToDTO(Location location) {
+
         return LocationDto.builder()
                 .idLocation(location.getIdLocation())
                 .name(location.getName())
-                .polygon(location.getPolygon())
+                .coordinates(convertPolygonToCoordinateList(location.getPolygon()))
                 .build();
+    }
+
+    private List<CoordinateDto> convertPolygonToCoordinateList(Polygon polygon) {
+        List<CoordinateDto> coordinateDtoList = new ArrayList<>();
+        for (Coordinate coordinate : polygon.getCoordinates()) {
+            coordinateDtoList.add(new CoordinateDto(coordinate.getX(), coordinate.getY()));
+        }
+        return coordinateDtoList;
     }
 
     private boolean isPolygonOpen(PolygonSaveDto saveDto) {
