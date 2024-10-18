@@ -12,6 +12,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        spatial:
+          connection_finder: com.example.geoIot.util.CustomSpatialConnection
     show-sql: true
   flyway:
     enabled: true
