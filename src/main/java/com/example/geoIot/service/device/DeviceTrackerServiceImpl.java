@@ -31,7 +31,7 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
     @Autowired
     private PersonRepository personRepository;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     private final Double DISTANCE_THRESHOLD = 10.0;
 
