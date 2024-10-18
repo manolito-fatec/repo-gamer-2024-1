@@ -54,7 +54,7 @@ public class DeviceTrackerController {
         return ResponseEntity.ok(dtoPage);
     }
 
-    @GetMapping("/history")
+    @PostMapping("/history")
     @Operation(summary = "Buscar o Histórico", description = "Realizar uma Requisição ao Oracle Cloud para Obter o Histórico de uma Pessoa")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Historico da Pessoa encontrado com sucesso."),
@@ -66,7 +66,7 @@ public class DeviceTrackerController {
     public ResponseEntity<?> getHistory(
             @RequestBody DeviceTrackerPeriodRequestDto filter,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "100") int size) {
+            @RequestParam(defaultValue = "200") int size) {
         try {
             Pageable pageable = PageRequest.of(page,size);
             Page<HistoryDto> dtoPage = service.searchHistoryByDateInterval(filter, pageable);

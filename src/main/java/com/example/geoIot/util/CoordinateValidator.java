@@ -2,7 +2,9 @@ package com.example.geoIot.util;
 
 import com.example.geoIot.exception.LatitudeValueException;
 import com.example.geoIot.exception.LongitudeValueException;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CoordinateValidator {
 
     public void validateCoordinate(double longitude, double latitude) {

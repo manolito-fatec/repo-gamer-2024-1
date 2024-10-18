@@ -48,6 +48,16 @@ public class LocationServiceImplTest {
         Location location = new Location();
         location.setIdLocation(id);
         location.setName("GetLocation Test");
+        Polygon mockPolygon = mock(Polygon.class);
+        Coordinate[] coordinates = new Coordinate[]{
+                new Coordinate(10.0, 20.0),
+                new Coordinate(15.0, 25.0),
+                new Coordinate(20.0, 30.0),
+                new Coordinate(10.0, 20.0) // Ensure it's closed
+        };
+        when(mockPolygon.getCoordinates()).thenReturn(coordinates);
+        location.setPolygon(mockPolygon);
+
         when(locationRepository.findById(id)).thenReturn(Optional.of(location));
 
         LocationDto locationDto = locationService.getLocation(id);
@@ -101,12 +111,26 @@ public class LocationServiceImplTest {
         LocationDto locationDto1 = locationDtos.get(0);
         assertEquals("Location 1", locationDto1.getName());
         assertEquals(1L, locationDto1.getIdLocation());
-        assertArrayEquals(coordinates1, locationDto1.getPolygon().getCoordinates()); // Check coordinates
+
+        List<CoordinateDto> expectedCoordinates1 = Arrays.asList(
+                new CoordinateDto(10.0, 20.0),
+                new CoordinateDto(15.0, 25.0),
+                new CoordinateDto(20.0, 30.0),
+                new CoordinateDto(10.0, 20.0)
+        );
+        assertEquals(expectedCoordinates1, locationDto1.getCoordinates());
 
         LocationDto locationDto2 = locationDtos.get(1);
         assertEquals("Location 2", locationDto2.getName());
         assertEquals(2L, locationDto2.getIdLocation());
-        assertArrayEquals(coordinates2, locationDto2.getPolygon().getCoordinates()); // Check coordinates
+
+        List<CoordinateDto> expectedCoordinates2 = Arrays.asList(
+                new CoordinateDto(30.0, 40.0),
+                new CoordinateDto(35.0, 45.0),
+                new CoordinateDto(40.0, 50.0),
+                new CoordinateDto(30.0, 40.0)
+        );
+        assertEquals(expectedCoordinates2, locationDto2.getCoordinates());
 
         verify(locationRepository, times(1)).findAll();
     }
@@ -136,6 +160,12 @@ public class LocationServiceImplTest {
         savedLocation.setName("SaveLocation Test");
 
         Polygon polygon = mock((Polygon.class));
+        when(polygon.getCoordinates()).thenReturn(new Coordinate[]{
+                new Coordinate(10.0, 20.0),
+                new Coordinate(15.0, 25.0),
+                new Coordinate(20.0, 30.0),
+                new Coordinate(10.0, 20.0)
+        });
         savedLocation.setPolygon(polygon);
 
         when(locationRepository.save(any(Location.class))).thenAnswer((InvocationOnMock invocation) -> {
@@ -150,12 +180,19 @@ public class LocationServiceImplTest {
         assertNotNull(locationDto);
         assertEquals(1L, locationDto.getIdLocation());
         assertEquals("SaveLocation Test", locationDto.getName());
-        assertEquals(polygon, locationDto.getPolygon());
+        List<CoordinateDto> expectedCoordinates = Arrays.asList(
+                new CoordinateDto(10.0, 20.0),
+                new CoordinateDto(15.0, 25.0),
+                new CoordinateDto(20.0, 30.0),
+                new CoordinateDto(10.0, 20.0)
+        );
+        assertEquals(expectedCoordinates, locationDto.getCoordinates());
         verify(coordinateValidator, times(4)) // Once per coordinate
                 .validateCoordinate(anyDouble(), anyDouble());
         ArgumentCaptor<Location> locationCaptor = ArgumentCaptor.forClass(Location.class);
         verify(locationRepository).save(locationCaptor.capture());
         Location location = locationCaptor.getValue();
+        assertNotNull(savedLocation.getPolygon());
         assertEquals(1L, location.getIdLocation());
         assertDoesNotThrow(() -> locationService.saveLocation(saveDto));
 

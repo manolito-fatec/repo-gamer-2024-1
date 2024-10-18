@@ -3,6 +3,8 @@ package com.example.geoIot.entity.dto;
 import lombok.*;
 import org.locationtech.jts.geom.Polygon;
 
+import java.util.List;
+
 
 @Getter
 @Setter
@@ -12,6 +14,6 @@ import org.locationtech.jts.geom.Polygon;
 public class LocationDto {
     private Long idLocation;
     private String name;
-    private Polygon polygon;
+    private List<CoordinateDto> coordinates;
 
 }
