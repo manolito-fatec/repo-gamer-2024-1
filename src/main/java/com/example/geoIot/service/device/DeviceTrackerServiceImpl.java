@@ -147,7 +147,7 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
     }
 
     protected Boolean deltaTimeIsValid(DeviceTracker pPoint1, DeviceTracker pPoint2) {
-        Duration duration = Duration.between(pPoint1.getCreatedAtDeviceTracker(), pPoint1.getCreatedAtDeviceTracker());
+        Duration duration = Duration.between(pPoint1.getCreatedAtDeviceTracker(), pPoint2.getCreatedAtDeviceTracker());
         Long timeElapsed = duration.toMinutes();
         return timeElapsed > TIME_THRESHOLD_MINUTES;
     }
