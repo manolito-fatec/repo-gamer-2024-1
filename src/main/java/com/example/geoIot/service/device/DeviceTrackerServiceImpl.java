@@ -4,6 +4,7 @@ import com.example.geoIot.entity.dto.DeviceTrackerDto;
 import com.example.geoIot.entity.dto.DeviceTrackerPeriodRequestDto;
 import com.example.geoIot.entity.dto.history.HistoryDto;
 import com.example.geoIot.entity.dto.history.LocationDto;
+import com.example.geoIot.entity.dto.history.StopDto;
 import com.example.geoIot.exception.PersonNotFoundException;
 import com.example.geoIot.entity.DeviceTracker;
 import com.example.geoIot.entity.Person;
@@ -33,7 +34,7 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-    private final Double DISTANCE_THRESHOLD = 10.0;
+    private final Double DISTANCE_THRESHOLD = 5.0;
 
     private final Long TIME_THRESHOLD_MINUTES = 15L;
 
@@ -80,33 +81,95 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
     }
 
     protected List<HistoryDto> generateHistoryDto(List<DeviceTracker> pDeviceTrackers) {
-        Queue<DeviceTracker> queueOfStartTracker = new LinkedList<>(pDeviceTrackers);
-        DeviceTracker firstPoint = queueOfStartTracker.poll();
         List<HistoryDto> historic = new ArrayList<>();
-        if (firstPoint != null) {
-            for (DeviceTracker pointTracker : queueOfStartTracker) {
-                if (isStop(firstPoint, pointTracker)) {
-                    LocationDto initialLocation = getAddress(firstPoint.getLatitude(), firstPoint.getLongitude());
-                    LocationDto finalLocation = getAddress(pointTracker.getLatitude(), pointTracker.getLongitude());
-                    Double distanceBetweenPoints = calculateDistance(firstPoint, pointTracker);
-                    LocalDateTime endTime = firstPoint.getCreatedAtDeviceTracker();
-                    LocalDateTime finalTime = pointTracker.getCreatedAtDeviceTracker();
-                    historic.add(new HistoryDto(endTime, finalTime, distanceBetweenPoints,initialLocation, finalLocation));
-                    firstPoint = pointTracker;
-                }
+        if(!pDeviceTrackers.isEmpty()){
+            StopDto firstStop = generateStop(pDeviceTrackers.get(0));
+            StopDto lastStop = generateStop(pDeviceTrackers.get(pDeviceTrackers.size() - 1));
+            List<StopDto> stops = generateListStop(pDeviceTrackers);
+            stops.add(0,firstStop);
+            stops.add(lastStop);
+            for (int i = 0; i < stops.size() - 1; i++) {
+                StopDto startStop = stops.get(i);
+                StopDto endStop = stops.get(i + 1);
+                HistoryDto newHistory = generateTravel(startStop,endStop);
+                historic.add(newHistory);
             }
         }
         return historic;
     }
 
-    protected Boolean isStop(DeviceTracker pFirstPoint, DeviceTracker pPointTracker) {
-        Duration duration = Duration.between(pFirstPoint.getCreatedAtDeviceTracker(), pPointTracker.getCreatedAtDeviceTracker());
+    private HistoryDto  generateTravel(StopDto pStop1, StopDto pStop2) {
+        LocationDto locationFirstPoint = getAddress(pStop2.getLatitude(), pStop2.getLongitude());
+        LocationDto locationSecondPoint = getAddress(pStop1.getLatitude(), pStop1.getLongitude());
+        LocalDateTime dateTimeFirstPoint = pStop1.getTimestamp();
+        LocalDateTime dateTimeSecondPoint = pStop2.getTimestamp();
+        Double distanceBetweenPoints = calculateDistance(pStop1, pStop2);
+        return new HistoryDto(
+                dateTimeFirstPoint,
+                dateTimeSecondPoint,
+                distanceBetweenPoints,
+                locationFirstPoint,
+                locationSecondPoint
+        );
+    }
+
+    private List<StopDto> generateListStop(List<DeviceTracker> pDeviceTrackers) {
+        List<StopDto> stopList = new ArrayList<>();
+        if (pDeviceTrackers != null || !pDeviceTrackers.isEmpty()) {
+            DeviceTracker referencePoint = pDeviceTrackers.get(0);
+            for (DeviceTracker pointTracker : pDeviceTrackers) {
+                if (this.deltaSpaceIsValid(referencePoint, pointTracker)) {
+                    if(this.deltaTimeIsValid(referencePoint, pointTracker)) {
+                        StopDto newStop = this.generateStop(pointTracker);
+                        stopList.add(newStop);
+                        referencePoint = pointTracker;
+                    }
+                }else {
+                    referencePoint = pointTracker;
+                }
+            }
+        }
+        return stopList;
+    }
+
+    private StopDto generateStop(DeviceTracker pDeviceTracker) {
+        LocationDto location = getAddress(pDeviceTracker.getLatitude(), pDeviceTracker.getLongitude());
+        return new StopDto(
+                pDeviceTracker.getLatitude(),
+                pDeviceTracker.getLongitude(),
+                pDeviceTracker.getCreatedAtDeviceTracker(),
+                location);
+    }
+
+    protected  Boolean deltaSpaceIsValid(DeviceTracker pPoint1, DeviceTracker pPoint2) {
+        Double distance = calculateDistance(pPoint1, pPoint2);
+        return  DISTANCE_THRESHOLD > distance;
+    }
+
+    protected Boolean deltaTimeIsValid(DeviceTracker pPoint1, DeviceTracker pPoint2) {
+        Duration duration = Duration.between(pPoint1.getCreatedAtDeviceTracker(), pPoint1.getCreatedAtDeviceTracker());
         Long timeElapsed = duration.toMinutes();
-        Double distance = calculateDistance(pFirstPoint, pPointTracker);
-        return timeElapsed > TIME_THRESHOLD_MINUTES && distance >= DISTANCE_THRESHOLD;
+        return timeElapsed > TIME_THRESHOLD_MINUTES;
     }
 
     protected Double calculateDistance(DeviceTracker pFirstPoint, DeviceTracker pSecondPoint) {
+        Double lat1 = Math.toRadians(pFirstPoint.getLatitude());
+        Double lon1 = Math.toRadians(pFirstPoint.getLongitude());
+        Double lat2 = Math.toRadians(pSecondPoint.getLatitude());
+        Double lon2 = Math.toRadians(pSecondPoint.getLongitude());
+
+        Double dLat = lat2 - lat1;
+        Double dLon = lon2 - lon1;
+
+        Double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1) * Math.cos(lat2) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return EARTH_RADIUS * c;
+    }
+
+    protected Double calculateDistance(StopDto pFirstPoint, StopDto pSecondPoint) {
         Double lat1 = Math.toRadians(pFirstPoint.getLatitude());
         Double lon1 = Math.toRadians(pFirstPoint.getLongitude());
         Double lat2 = Math.toRadians(pSecondPoint.getLatitude());
