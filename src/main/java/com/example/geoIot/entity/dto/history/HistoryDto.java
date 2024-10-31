@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 public class HistoryDto {
-    private LocalDateTime endTime;
-    private LocalDateTime finalTime;
-    private Double distanceBetweenPoints;
-    private LocationDto initialLocation;
-    private LocationDto finalLocation;
+    private LocalDateTime initDateTime;
+    private LocalDateTime endDateTime;
+    private Double distance;
+    private LocationDto initial;
+    private LocationDto finality;
 }
