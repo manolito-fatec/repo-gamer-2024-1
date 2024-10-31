@@ -55,16 +55,16 @@ class DeviceTrackerServiceImplTest {
             null,
             "1640966C-BBAC-4A26-8A06-0670296D361C",
             LocalDateTime.now(),
-            0.5840530000,
-            -60.4578730000,
+            0.784053,
+            -60.457873,
             person
     );
     private DeviceTracker deviceTracker2 = new DeviceTracker(
             null,
             "53CA1452-77FF-4B77-94CF-0037B3C00054",
             LocalDateTime.now().plusMinutes(13),
-            0.5840530000,
-            -60.4578731000,
+            0.5840540000,
+            -60.4578737000,
             person
     );
     private DeviceTracker deviceTracker3 = new DeviceTracker(
@@ -80,8 +80,8 @@ class DeviceTrackerServiceImplTest {
             1l,
             "Fatec address.",
             LocalDateTime.now(),
-            -23.1624687,
-            -45.7946497,
+            -23.1623982,
+            -45.7947135,
             person
     );
 
@@ -90,7 +90,7 @@ class DeviceTrackerServiceImplTest {
             "DD287909-46BE-4E8B-A926-0056596288B2",
             LocalDateTime.now().plusMinutes(16),
             -23.1623982,
-            -45.7947135,
+            -45.7947134,
             person
     );
 
@@ -183,21 +183,32 @@ class DeviceTrackerServiceImplTest {
     }
 
     @Test
-    @DisplayName("should check if the time is greater than 15 minutes and the distance between the points is greater than 10 meters.")
-    void isStop(){
-        assertEquals(true,deviceService.isStop(deviceTracker4,deviceTracker5));
+    @DisplayName("should check if the distance between two points is less than 10")
+    void deltaSpace(){
+        assertEquals(true,deviceService.deltaSpaceIsValid(deviceTracker4,deviceTracker5));
     }
 
     @Test
-    @DisplayName("shouldn't be a stop because the time variation is less than 15 minutes")
-    void notStop(){
-        assertEquals(false,deviceService.isStop(deviceTracker1,deviceTracker2));
+    @DisplayName(" should check if the distance between two points is greater than 10.")
+    void notDeltaSpace(){
+        assertEquals(false,deviceService.deltaSpaceIsValid(deviceTracker1,deviceTracker2));
     }
 
     @Test
-    @DisplayName("I should return data from an address.")
+    @DisplayName("Should return data from an address.")
     void getAddress(){
         assertEquals("FATEC - SJC", deviceService.getAddress(deviceTracker4.getLatitude(), deviceTracker4.getLongitude()).getName());
     }
 
+    @Test
+    @DisplayName("Should return true if time difference is more that 15 min")
+    void deltaTimeDifference(){
+        assertEquals(true, deviceService.deltaTimeIsValid(deviceTracker1, deviceTracker3));
+    }
+
+    @Test
+    @DisplayName("Should return true if time difference is less that 15 min")
+    void notDeltaTimeDifference(){
+        assertEquals(false, deviceService.deltaTimeIsValid(deviceTracker1, deviceTracker2));
+    }
 }
