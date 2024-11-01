@@ -43,15 +43,21 @@ public class DeviceTrackerController {
             @PathVariable LocalDateTime end,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size
-    ) throws MethodArgumentTypeException, InvalidRequestException {
-        DeviceTrackerPeriodRequestDto requestDto = DeviceTrackerPeriodRequestDto.builder()
-                .personId(personId)
-                .init(init)
-                .end(end)
-                .build();
-        Pageable pageable = PageRequest.of(page, size);
-        Page<DeviceTrackerDto> dtoPage = service.getDeviceTrackerByDateInterval(requestDto, pageable);
-        return ResponseEntity.ok(dtoPage);
+    ) {
+        try {
+            DeviceTrackerPeriodRequestDto requestDto = DeviceTrackerPeriodRequestDto.builder()
+                    .personId(personId)
+                    .init(init)
+                    .end(end)
+                    .build();
+            Pageable pageable = PageRequest.of(page, size);
+            Page<DeviceTrackerDto> dtoPage = service.getDeviceTrackerByDateInterval(requestDto, pageable);
+            return ResponseEntity.ok(dtoPage);
+        } catch (NoSuchElementException noSuchElementException) {
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
     }
 
     @PostMapping("/history")
