@@ -189,10 +189,11 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
 
     protected LocationDto getAddress(Double pLatitude, Double pLongitude){
         RestClient restClient = RestClient.create();
-        return restClient.get()
+        var test = restClient.get()
                 .uri(BASEURL +"/reverse?lat={lat}&lon={lon}&accept-language=pt_br&format=json", pLatitude, pLongitude)
                 .retrieve()
                 .body(LocationDto.class);
+        return test;
     }
 
     private void validateDeviceTracker(DeviceTracker pDeviceTracker) {

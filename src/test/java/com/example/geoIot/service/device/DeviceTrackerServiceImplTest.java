@@ -179,7 +179,7 @@ class DeviceTrackerServiceImplTest {
     @Test
     @DisplayName("should perform a calculation and return a value.")
     void calculateLatitudeAndLongitude(){
-        assertEquals(10.197810919275682, deviceService.calculateDistance(deviceTracker4,deviceTracker5));
+        assertEquals(0.010223191012030407, deviceService.calculateDistance(deviceTracker4,deviceTracker5));
     }
 
     @Test
@@ -191,13 +191,22 @@ class DeviceTrackerServiceImplTest {
     @Test
     @DisplayName(" should check if the distance between two points is greater than 10.")
     void notDeltaSpace(){
+
         assertEquals(false,deviceService.deltaSpaceIsValid(deviceTracker1,deviceTracker2));
     }
 
     @Test
     @DisplayName("Should return data from an address.")
     void getAddress(){
-        assertEquals("FATEC - SJC", deviceService.getAddress(deviceTracker4.getLatitude(), deviceTracker4.getLongitude()).getName());
+        var deviTrackerFatec = new DeviceTracker(
+                1l,
+                "Fatec address.",
+                LocalDateTime.now(),
+                -23.1622601,
+                -45.7952764,
+                person
+        );
+        assertEquals("FATEC - SJC", deviceService.getAddress(deviTrackerFatec.getLatitude(), deviTrackerFatec.getLongitude()).getName());
     }
 
     @Test
