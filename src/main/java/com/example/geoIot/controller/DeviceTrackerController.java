@@ -66,7 +66,7 @@ public class DeviceTrackerController {
     public ResponseEntity<?> getHistory(
             @RequestBody DeviceTrackerPeriodRequestDto filter,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "200") int size) {
+            @RequestParam(defaultValue = "100") int size) {
         try {
             Pageable pageable = PageRequest.of(page,size);
             Page<HistoryDto> dtoPage = service.searchHistoryByDateInterval(filter, pageable);

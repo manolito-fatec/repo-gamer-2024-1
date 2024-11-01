@@ -76,8 +76,9 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
         LocalDateTime initDate = LocalDateTime.parse(pRequestDto.getInit().toString(), formatter);
         LocalDateTime endDate = LocalDateTime.parse(pRequestDto.getEnd().toString(), formatter);
         Page<DeviceTracker> deviceTrackers = deviceTrackerRepository.filterToHistoric(personId, initDate, endDate, pageable);
+        Long totalNumberOfPoints = deviceTrackerRepository.countPoint(personId, initDate, endDate);
         List<HistoryDto> historic = generateHistoryDto(deviceTrackers.getContent());
-        return new PageImpl<>(historic, pageable, historic.size());
+        return new PageImpl<>(historic, pageable,totalNumberOfPoints);
     }
 
     protected List<HistoryDto> generateHistoryDto(List<DeviceTracker> pDeviceTrackers) {

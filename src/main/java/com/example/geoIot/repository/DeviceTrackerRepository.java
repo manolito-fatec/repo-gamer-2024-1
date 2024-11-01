@@ -22,4 +22,13 @@ public interface DeviceTrackerRepository extends JpaRepository<DeviceTracker, Lo
     """)
     public Page<DeviceTracker> filterToHistoric(Long personId, LocalDateTime init, LocalDateTime end, Pageable pageable);
 
+    @Query("""
+    select COUNT(dt) 
+    from DeviceTracker dt
+    where dt.personDeviceTracker.idPerson = ?1 and 
+    dt.createdAtDeviceTracker BETWEEN ?2 AND ?3
+    order by dt.createdAtDeviceTracker asc
+    """)
+    public Long countPoint(Long personId, LocalDateTime init, LocalDateTime end);
+
 }
