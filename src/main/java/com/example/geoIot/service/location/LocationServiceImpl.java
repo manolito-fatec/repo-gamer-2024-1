@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -45,7 +47,7 @@ public class LocationServiceImpl implements LocationService {
             throw new NoSuchElementException("No locations exist yet");
         }
         return locationList.stream()
-                .map(this::convertToDTO)
+                .map(this::buildLocationDto) // Use the new buildLocationDto method
                 .toList();
     }
 
@@ -88,28 +90,6 @@ public class LocationServiceImpl implements LocationService {
         location.setGeom(geometry);
         Location savedLocation = locationRepository.save(location);
         return buildLocationDto(savedLocation);
-    }
-
-    private LocationDto convertToDTO(Location location) {
-        List<CoordinateDto> coordinates = convertGeometryToCoordinateList(location.getGeom());
-        String shape = (String) location.getGeom().getUserData(); // Cast to String to get shape
-
-        Double radius = null;
-        CoordinateDto center = null;
-
-        if ("CIRCLE".equalsIgnoreCase(shape)) {
-            radius = location.getGeom().getEnvelopeInternal().getWidth() / 2;
-            center = new CoordinateDto(location.getGeom().getCoordinate().getX(), location.getGeom().getCoordinate().getY());
-        }
-
-        return LocationDto.builder()
-                .idLocation(location.getIdLocation())
-                .name(location.getName())
-                .coordinates(coordinates)
-                .shape(shape)
-                .radius(radius)
-                .center(center)
-                .build();
     }
 
     private List<CoordinateDto> convertGeometryToCoordinateList(Geometry geometry) {
@@ -159,9 +139,14 @@ public class LocationServiceImpl implements LocationService {
             if (isCircle(shell)) {
                 Coordinate centerCoord = polygon.getCentroid().getCoordinate();
                 double radius = centerCoord.distance(shell.getCoordinateN(0));
+
+                double roundedCenterX = round(centerCoord.x, 8);
+                double roundedCenterY = round(centerCoord.y, 8);
+                double roundedRadius = round(radius, 8);
+
                 dtoBuilder.shape("CIRCLE")
-                        .center(new CoordinateDto(centerCoord.x, centerCoord.y))
-                        .radius(radius);
+                        .center(new CoordinateDto(roundedCenterX, roundedCenterY))
+                        .radius(roundedRadius);
             } else {
                 dtoBuilder.shape("POLYGON")
                         .coordinates(convertGeometryToCoordinateList(polygon));
@@ -170,6 +155,11 @@ public class LocationServiceImpl implements LocationService {
 
         return dtoBuilder.build();
     }
-    
-    private void saveCircle(GeomSaveDto geomSaveDto) {}
-}
+
+    private double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }}
