@@ -81,6 +81,14 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
         return new PageImpl<>(historic, pageable,totalNumberOfPoints);
     }
 
+    @Override
+    public List<DeviceTrackerDto> getTrackersInsideLocation(Long locationId, LocalDateTime init, LocalDateTime end, Long userId) {
+        List<DeviceTracker> deviceTrackerList = deviceTrackerRepository.findTrackersInsideLocation(locationId, init, end, userId);
+        return deviceTrackerList.stream()
+                .map(this::dtoConverter)
+                .toList();
+    }
+
     protected List<HistoryDto> generateHistoryDto(List<DeviceTracker> pDeviceTrackers) {
         List<HistoryDto> historic = new ArrayList<>();
         if(!pDeviceTrackers.isEmpty()){

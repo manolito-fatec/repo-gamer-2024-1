@@ -7,6 +7,7 @@ import com.example.geoIot.entity.dto.history.HistoryDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -16,4 +17,6 @@ public interface DeviceTrackerService {
     Page<DeviceTrackerDto> getDeviceTrackerByDateInterval(DeviceTrackerPeriodRequestDto requestDto, Pageable pageable);
 
     Page<HistoryDto> searchHistoryByDateInterval(DeviceTrackerPeriodRequestDto requestDto, Pageable pageable);
+
+    List<DeviceTrackerDto> getTrackersInsideLocation(Long locationId, LocalDateTime init, LocalDateTime end, Long userId);
 }
