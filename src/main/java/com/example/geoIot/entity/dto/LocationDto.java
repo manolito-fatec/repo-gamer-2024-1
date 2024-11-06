@@ -14,6 +14,8 @@ import java.util.List;
 public class LocationDto {
     private Long idLocation;
     private String name;
+    private String shape;
     private List<CoordinateDto> coordinates;
-
+    private CoordinateDto center;
+    private Double radius;
 }

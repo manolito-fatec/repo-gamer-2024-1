@@ -8,7 +8,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PolygonSaveDto {
-    private List<CoordinateDto> coordinates;
+public class GeomSaveDto {
     private String name;
+    private String shape;
+    private List<CoordinateDto> coordinates;
+    private CoordinateDto center;
+    private Double radius;
 }

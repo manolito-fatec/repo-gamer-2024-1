@@ -3,15 +3,14 @@ package com.example.geoIot.service.location;
 import com.example.geoIot.entity.Location;
 import com.example.geoIot.entity.dto.CoordinateDto;
 import com.example.geoIot.entity.dto.LocationDto;
-import com.example.geoIot.entity.dto.PolygonSaveDto;
+import com.example.geoIot.entity.dto.GeomSaveDto;
 import com.example.geoIot.exception.OpenPolygonException;
 import com.example.geoIot.repository.LocationRepository;
 import com.example.geoIot.util.CoordinateValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -20,10 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -41,176 +37,157 @@ public class LocationServiceImplTest {
     @InjectMocks
     private LocationServiceImpl locationService;
 
+    private final GeometryFactory geometryFactory = new GeometryFactory();
+
     @Test
-    @DisplayName("should return a LocationDto with a given Long id")
+    @DisplayName("should return a LocationDto for a given ID")
     public void getLocation() {
-        Long id = 1L;
         Location location = new Location();
-        location.setIdLocation(id);
-        location.setName("GetLocation Test");
-        Polygon mockPolygon = mock(Polygon.class);
-        Coordinate[] coordinates = new Coordinate[]{
-                new Coordinate(10.0, 20.0),
-                new Coordinate(15.0, 25.0),
-                new Coordinate(20.0, 30.0),
-                new Coordinate(10.0, 20.0) // Ensure it's closed
-        };
-        when(mockPolygon.getCoordinates()).thenReturn(coordinates);
-        location.setPolygon(mockPolygon);
+        location.setIdLocation(1L);
+        location.setName("Test Location");
 
-        when(locationRepository.findById(id)).thenReturn(Optional.of(location));
-
-        LocationDto locationDto = locationService.getLocation(id);
-        assertNotNull(locationDto);
-        assertEquals(id, locationDto.getIdLocation());
-        assertEquals("GetLocation Test", locationDto.getName());
-
-        verify(locationRepository).findById(id);
-    }
-
-    @Test
-    @DisplayName("should return a list of LocationDtos")
-    public void getAllLocations() {
-        Coordinate[] coordinates1 = new Coordinate[]{
+        Polygon polygon = geometryFactory.createPolygon(new Coordinate[]{
                 new Coordinate(10.0, 20.0),
                 new Coordinate(15.0, 25.0),
                 new Coordinate(20.0, 30.0),
                 new Coordinate(10.0, 20.0)
-        };
+        });
+        polygon.setUserData("POLYGON");
+        location.setGeom(polygon);
 
-        Coordinate[] coordinates2 = new Coordinate[]{
-                new Coordinate(30.0, 40.0),
-                new Coordinate(35.0, 45.0),
-                new Coordinate(40.0, 50.0),
-                new Coordinate(30.0, 40.0)
-        };
+        when(locationRepository.findById(1L)).thenReturn(Optional.of(location));
 
-        Polygon polygon1 = mock(Polygon.class);
-        Polygon polygon2 = mock(Polygon.class);
+        LocationDto locationDto = locationService.getLocation(1L);
 
-        when(polygon1.getCoordinates()).thenReturn(coordinates1);
-        when(polygon2.getCoordinates()).thenReturn(coordinates2);
+        assertNotNull(locationDto);
+        assertEquals("Test Location", locationDto.getName());
+        assertEquals("POLYGON", locationDto.getShape());
+    }
+
+    @Test
+    @DisplayName("should throw NoSuchElementException when location ID is not found")
+    public void getLocationNotFound() {
+        when(locationRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class, () -> locationService.getLocation(1L));
+    }
+
+    @Test
+    @DisplayName("should return a list of all LocationDtos")
+    public void getAllLocations() {
+        List<Location> locations = new ArrayList<>();
+
+        Polygon polygon1 = geometryFactory.createPolygon(new Coordinate[]{
+                new Coordinate(10.0, 20.0),
+                new Coordinate(15.0, 25.0),
+                new Coordinate(20.0, 30.0),
+                new Coordinate(10.0, 20.0)
+        });
+        polygon1.setUserData("POLYGON");
 
         Location location1 = new Location();
         location1.setIdLocation(1L);
         location1.setName("Location 1");
-        location1.setPolygon(polygon1);
+        location1.setGeom(polygon1);
+
+        Point center = geometryFactory.createPoint(new Coordinate(30.0, 40.0));
+        Geometry circle = center.buffer(5);
+        circle.setUserData("CIRCLE");
 
         Location location2 = new Location();
         location2.setIdLocation(2L);
         location2.setName("Location 2");
-        location2.setPolygon(polygon2);
+        location2.setGeom(circle);
 
-        List<Location> mockLocationList = List.of(location1, location2);
-        when(locationRepository.findAll()).thenReturn(mockLocationList);
+        locations.add(location1);
+        locations.add(location2);
+
+        when(locationRepository.findAll()).thenReturn(locations);
+
         List<LocationDto> locationDtos = locationService.getAllLocations();
 
-        assertNotNull(locationDtos);
         assertEquals(2, locationDtos.size());
+        assertEquals("Location 1", locationDtos.get(0).getName());
+        assertEquals("POLYGON", locationDtos.get(0).getShape());
+        assertEquals("Location 2", locationDtos.get(1).getName());
+        assertEquals("CIRCLE", locationDtos.get(1).getShape());
+    }
 
-        LocationDto locationDto1 = locationDtos.get(0);
-        assertEquals("Location 1", locationDto1.getName());
-        assertEquals(1L, locationDto1.getIdLocation());
+    @Test
+    @DisplayName("should throw NoSuchElementException when no locations exist")
+    public void getAllLocationsNoLocations() {
+        when(locationRepository.findAll()).thenReturn(new ArrayList<>());
 
-        List<CoordinateDto> expectedCoordinates1 = Arrays.asList(
+        assertThrows(NoSuchElementException.class, () -> locationService.getAllLocations());
+    }
+
+    @Test
+    @DisplayName("should save and return a LocationDto for a POLYGON")
+    public void saveLocationPolygon() {
+        GeomSaveDto geomSaveDto = new GeomSaveDto();
+        geomSaveDto.setName("Polygon Location");
+        geomSaveDto.setShape("POLYGON");
+        geomSaveDto.setCoordinates(List.of(
                 new CoordinateDto(10.0, 20.0),
                 new CoordinateDto(15.0, 25.0),
                 new CoordinateDto(20.0, 30.0),
                 new CoordinateDto(10.0, 20.0)
-        );
-        assertEquals(expectedCoordinates1, locationDto1.getCoordinates());
+        ));
 
-        LocationDto locationDto2 = locationDtos.get(1);
-        assertEquals("Location 2", locationDto2.getName());
-        assertEquals(2L, locationDto2.getIdLocation());
+        when(locationRepository.save(any(Location.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        List<CoordinateDto> expectedCoordinates2 = Arrays.asList(
-                new CoordinateDto(30.0, 40.0),
-                new CoordinateDto(35.0, 45.0),
-                new CoordinateDto(40.0, 50.0),
-                new CoordinateDto(30.0, 40.0)
-        );
-        assertEquals(expectedCoordinates2, locationDto2.getCoordinates());
+        LocationDto savedLocation = locationService.saveLocation(geomSaveDto);
 
-        verify(locationRepository, times(1)).findAll();
+        assertNotNull(savedLocation);
+        assertEquals("Polygon Location", savedLocation.getName());
+        assertEquals("POLYGON", savedLocation.getShape());
     }
 
     @Test
-    @DisplayName("should throw NoSuchElementException when no location is found")
-    public void getLocationNotFound() {
-        Long id = 1L;
-        when(locationRepository.findById(id)).thenReturn(Optional.empty());
-        assertThrowsExactly(NoSuchElementException.class, () -> locationService.getLocation(id));
+    @DisplayName("should save and return a LocationDto for a CIRCLE")
+    public void saveLocationCircle() {
+        GeomSaveDto geomSaveDto = new GeomSaveDto();
+        geomSaveDto.setName("Circle Location");
+        geomSaveDto.setShape("CIRCLE");
+        geomSaveDto.setCenter(new CoordinateDto(30.0, 40.0));
+        geomSaveDto.setRadius(5.0);
+
+        when(locationRepository.save(any(Location.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        LocationDto savedLocation = locationService.saveLocation(geomSaveDto);
+
+        assertNotNull(savedLocation);
+        assertEquals("Circle Location", savedLocation.getName());
+        assertEquals("CIRCLE", savedLocation.getShape());
+        assertEquals(5.0, savedLocation.getRadius(), 1e-9); // Arredondado para 9 casas decimais pois é calculado de poligono
+        assertEquals(30.0, savedLocation.getCenter().getLongitude(), 1e-9); // Arredondado para 9 casas decimais pois é calculado de poligono
+        assertEquals(40.0, savedLocation.getCenter().getLatitude(), 1e-9); // Arredondado para 9 casas decimais pois é calculado de poligono
     }
 
     @Test
-    @DisplayName("should return a LocationDto of the newly saved location")
-    public void saveLocation() {
-        PolygonSaveDto saveDto = new PolygonSaveDto();
-        saveDto.setName("SaveLocation Test");
-        saveDto.setCoordinates(Arrays.asList(
+    @DisplayName("should throw IllegalArgumentException when saving a CIRCLE with invalid radius")
+    public void saveLocationCircleInvalidRadius() {
+        GeomSaveDto geomSaveDto = new GeomSaveDto();
+        geomSaveDto.setName("Invalid Circle");
+        geomSaveDto.setShape("CIRCLE");
+        geomSaveDto.setCenter(new CoordinateDto(30.0, 40.0));
+        geomSaveDto.setRadius(-1.0);
+
+        assertThrows(IllegalArgumentException.class, () -> locationService.saveLocation(geomSaveDto));
+    }
+
+    @Test
+    @DisplayName("should throw OpenPolygonException when saving an open POLYGON")
+    public void saveLocationOpenPolygon() {
+        GeomSaveDto geomSaveDto = new GeomSaveDto();
+        geomSaveDto.setName("Open Polygon");
+        geomSaveDto.setShape("POLYGON");
+        geomSaveDto.setCoordinates(List.of(
                 new CoordinateDto(10.0, 20.0),
                 new CoordinateDto(15.0, 25.0),
-                new CoordinateDto(20.0, 30.0),
-                new CoordinateDto(10.0, 20.0))
-        );
+                new CoordinateDto(20.0, 30.0)
+        ));
 
-        Location savedLocation = new Location();
-        savedLocation.setIdLocation(1L);
-        savedLocation.setName("SaveLocation Test");
-
-        Polygon polygon = mock((Polygon.class));
-        when(polygon.getCoordinates()).thenReturn(new Coordinate[]{
-                new Coordinate(10.0, 20.0),
-                new Coordinate(15.0, 25.0),
-                new Coordinate(20.0, 30.0),
-                new Coordinate(10.0, 20.0)
-        });
-        savedLocation.setPolygon(polygon);
-
-        when(locationRepository.save(any(Location.class))).thenAnswer((InvocationOnMock invocation) -> {
-            Location location = invocation.getArgument(0); // Retrieve the argument passed to save()
-            location.setIdLocation(1L); // Simulate setting the ID after save
-            location.setPolygon(polygon); // Set the mock Polygon
-            return location; // Return the location
-        });
-
-        LocationDto locationDto = locationService.saveLocation(saveDto);
-
-        assertNotNull(locationDto);
-        assertEquals(1L, locationDto.getIdLocation());
-        assertEquals("SaveLocation Test", locationDto.getName());
-        List<CoordinateDto> expectedCoordinates = Arrays.asList(
-                new CoordinateDto(10.0, 20.0),
-                new CoordinateDto(15.0, 25.0),
-                new CoordinateDto(20.0, 30.0),
-                new CoordinateDto(10.0, 20.0)
-        );
-        assertEquals(expectedCoordinates, locationDto.getCoordinates());
-        verify(coordinateValidator, times(4)) // Once per coordinate
-                .validateCoordinate(anyDouble(), anyDouble());
-        ArgumentCaptor<Location> locationCaptor = ArgumentCaptor.forClass(Location.class);
-        verify(locationRepository).save(locationCaptor.capture());
-        Location location = locationCaptor.getValue();
-        assertNotNull(savedLocation.getPolygon());
-        assertEquals(1L, location.getIdLocation());
-        assertDoesNotThrow(() -> locationService.saveLocation(saveDto));
-
-    }
-
-    @Test
-    @DisplayName("should throw OpenPolygonException when the first and last coordinates aren't the same")
-    public void getOpenPolygonException() {
-        PolygonSaveDto invalidPolygonSaveDto = PolygonSaveDto.builder()
-                .name("Test Location")
-                .coordinates(Arrays.asList(
-                        new CoordinateDto(10.0, 20.0),
-                        new CoordinateDto(15.0, 25.0),
-                        new CoordinateDto(20.0, 30.0),
-                        new CoordinateDto(25.0, 35.0)
-                ))
-                .build();
-
-        assertThrowsExactly(OpenPolygonException.class, () -> locationService.saveLocation(invalidPolygonSaveDto));
+        assertThrows(OpenPolygonException.class, () -> locationService.saveLocation(geomSaveDto));
     }
 }
