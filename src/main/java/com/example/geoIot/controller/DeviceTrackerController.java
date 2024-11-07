@@ -85,7 +85,6 @@ public class DeviceTrackerController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
-
     @GetMapping("/inside/{locationId}/{init}/{end}")
     @Operation(summary = "Buscar pontos dentro da área de uma forma", description = "Faz uma requisição ao OracleCloud trazendo uma lista de coordenadas dentro da forma requisitada")
     @ApiResponses(value = {

@@ -42,7 +42,7 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public List<LocationDto> getAllLocations() {
-        List<Location> locationList = locationRepository.findAll();
+        List<Location> locationList = locationRepository.findAllByOrderByIdLocationDesc();
         if (locationList.isEmpty()) {
             throw new NoSuchElementException("No locations exist yet");
         }
