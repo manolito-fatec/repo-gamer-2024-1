@@ -71,6 +71,24 @@ public class DeviceTrackerServiceImpl implements DeviceTrackerService {
     }
 
     @Override
+    public Page<StopDto> getStopList(DeviceTrackerPeriodRequestDto requestDto, Pageable pageable) {
+        Page<DeviceTracker> deviceTrackerPage = deviceTrackerRepository
+                .findByPersonDeviceTrackerIdPersonAndCreatedAtDeviceTrackerBetweenOrderByCreatedAtDeviceTracker(
+                        requestDto.getPersonId(),
+                        requestDto.getInit(),
+                        requestDto.getEnd(),
+                        pageable
+                );
+        if (deviceTrackerPage.isEmpty()) {
+            throw new NoSuchElementException("No data available for the requested period.");
+        } else {
+            List<StopDto> stopList = this.generateListStop(deviceTrackerPage.getContent());
+            Long totalNumberOfPoints = deviceTrackerRepository.countPoint(requestDto.getPersonId(), requestDto.getInit(), requestDto.getEnd());
+            return new PageImpl<>(stopList,pageable,totalNumberOfPoints);
+        }
+    }
+
+    @Override
     public Page<HistoryDto> searchHistoryByDateInterval(DeviceTrackerPeriodRequestDto pRequestDto, Pageable pageable) {
         Long personId = pRequestDto.getPersonId();
         LocalDateTime initDate = LocalDateTime.parse(pRequestDto.getInit().toString(), formatter);
