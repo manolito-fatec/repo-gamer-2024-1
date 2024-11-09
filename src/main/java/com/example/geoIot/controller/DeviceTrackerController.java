@@ -6,6 +6,7 @@ import com.example.geoIot.entity.dto.history.HistoryDto;
 import com.example.geoIot.entity.dto.history.StopDto;
 import com.example.geoIot.service.device.DeviceTrackerService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Tag(name = "Consulta - Controller", description = "Endpoints para consultar dispositivos e pessoas por período")
@@ -81,6 +84,30 @@ public class DeviceTrackerController {
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+    @GetMapping("/inside/{locationId}/{init}/{end}")
+    @Operation(summary = "Buscar pontos dentro da área de uma forma", description = "Faz uma requisição ao OracleCloud trazendo uma lista de coordenadas dentro da forma requisitada")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pontos encontrados com sucesso."),
+            @ApiResponse(responseCode = "400", description = "Requisição má formulada"),
+            @ApiResponse(responseCode = "404", description = "Local com o ID fornecido não foi encontrado."),
+            @ApiResponse(responseCode = "408", description = "Tempo de resposta excedido."),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor ao tentar buscar a pessoa.")
+    })
+    public ResponseEntity<?> getTrackersInsideLocation(
+        @Parameter(required = true) @PathVariable Long locationId,
+        @Parameter(required = true) @PathVariable LocalDateTime init,
+        @Parameter(required = true) @PathVariable LocalDateTime end,
+        @Parameter() @RequestParam(required = false) Long userId
+    ) {
+        try {
+            List<DeviceTrackerDto> deviceTrackers = service.getTrackersInsideLocation(locationId, init, end, userId);
+            return ResponseEntity.ok(deviceTrackers);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Collections.singletonList("Error: " + e.getMessage()));
         }
     }
 
