@@ -35,15 +35,13 @@ public interface DeviceTrackerRepository extends JpaRepository<DeviceTracker, Lo
     @Query(value = """
     SELECT dt.*
     FROM tracker dt
-    JOIN location loc ON SDO_RELATE(
-        loc.poly,
-        SDO_GEOMETRY(2001, 4326, SDO_POINT_TYPE(dt.longitude, dt.latitude, NULL), NULL, NULL),
-        'mask=INSIDE'
-    ) = 'TRUE'
-    WHERE loc.id_location = :locationId
-      AND dt.created_at BETWEEN :init AND :end
-      AND (:userId IS NULL OR dt.id_person = :userId)
-    ORDER BY dt.created_at
+    WHERE SDO_INSIDE(
+            SDO_GEOMETRY(2001, 4326, SDO_POINT_TYPE(dt.longitude, dt.latitude, NULL), NULL, NULL),
+            (SELECT poly FROM location WHERE id_location = :locationId)
+            ) = 'TRUE'
+    AND dt.created_at BETWEEN :init AND :end
+    AND (:userId IS NULL OR dt.id_person = :userId)
+    ORDER BY dt.created_at;
     """, nativeQuery = true)
     List<DeviceTracker> findTrackersInsideLocation(
             @Param("locationId") Long locationId,
