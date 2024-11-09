@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -89,6 +90,25 @@ public class LocationController {
             return ResponseEntity.badRequest().body("Bad Request: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Deleção de um polígono de local", description = "Faz uma requisição ao OracleCloud deletando os dados de um polígono ou circulo")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Polígono/Circulo deletado com sucesso."),
+            @ApiResponse(responseCode = "400", description = "Requisição mal formulada."),
+            @ApiResponse(responseCode = "408", description = "Tempo de resposta excedido."),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor ao tentar deletar o local.")
+    })
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<?> deleteShape(
+            @Parameter(description = "ID da geometria a ser deletada", required = true) @PathVariable Long id
+    ) {
+        try {
+            String response = service.deleteLocation(id);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 }
