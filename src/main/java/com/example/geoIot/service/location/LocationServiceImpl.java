@@ -92,6 +92,13 @@ public class LocationServiceImpl implements LocationService {
         return buildLocationDto(savedLocation);
     }
 
+    @Transactional
+    @Override
+    public String deleteLocation(Long id) {
+        locationRepository.deleteById(id);
+        return "Local com id " + id + " deletado com sucesso.";
+    }
+
     private List<CoordinateDto> convertGeometryToCoordinateList(Geometry geometry) {
         List<CoordinateDto> coordinateDtoList = new ArrayList<>();
         if (geometry != null) {
