@@ -9,4 +9,5 @@ public interface LocationService {
     LocationDto getLocation(Long id);
     List<LocationDto> getAllLocations();
     LocationDto saveLocation(GeomSaveDto geomSaveDto);
+    String deleteLocation(Long id);
 }
