@@ -1,9 +1,6 @@
-UPDATE location
-SET poly = SDO_CS.TRANSFORM(poly, 4326)
-WHERE poly IS NOT NULL AND poly.sdo_srid IS NULL;
+ALTER TABLE location MODIFY id_location RESTART WITH 1;
 
-
----------------------
+-------
 
 INSERT INTO USER_SDO_GEOM_METADATA (TABLE_NAME, COLUMN_NAME, DIMINFO, SRID)
 VALUES (
@@ -15,3 +12,8 @@ VALUES (
            ),
            4326
        );
+
+-------
+
+ALTER TABLE location
+    ADD CONSTRAINT enforce_srid_4326 CHECK (poly.sdo_srid = 4326);
