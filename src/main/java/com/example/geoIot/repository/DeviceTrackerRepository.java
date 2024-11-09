@@ -41,7 +41,7 @@ public interface DeviceTrackerRepository extends JpaRepository<DeviceTracker, Lo
             ) = 'TRUE'
     AND dt.created_at BETWEEN :init AND :end
     AND (:userId IS NULL OR dt.id_person = :userId)
-    ORDER BY dt.created_at;
+    ORDER BY dt.created_at
     """, nativeQuery = true)
     List<DeviceTracker> findTrackersInsideLocation(
             @Param("locationId") Long locationId,
