@@ -1,12 +1,7 @@
 UPDATE location
-SET poly = SDO_GEOMETRY(
-    2003, -- 2003 indicates a polygon (update if your geometry type is different)
-    4326, -- Setting SRID to 4326
-    NULL,
-    poly.sdo_elem_info,
-    poly.sdo_ordinates
-)
-WHERE poly IS NOT NULL;
+SET poly = SDO_CS.TRANSFORM(poly, 4326)
+WHERE poly IS NOT NULL AND poly.sdo_srid IS NULL;
+
 
 ---------------------
 
