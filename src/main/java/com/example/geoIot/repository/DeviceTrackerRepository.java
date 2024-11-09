@@ -36,7 +36,7 @@ public interface DeviceTrackerRepository extends JpaRepository<DeviceTracker, Lo
     SELECT dt.*
     FROM tracker dt
     JOIN location loc ON SDO_RELATE(
-        loc.geom,
+        loc.poly,
         SDO_GEOMETRY(2001, 8307, SDO_POINT_TYPE(dt.longitude, dt.latitude, NULL), NULL, NULL),
         'mask=INSIDE'
     ) = 'TRUE'
