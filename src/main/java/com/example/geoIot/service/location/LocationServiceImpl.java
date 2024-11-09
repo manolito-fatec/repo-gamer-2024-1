@@ -92,6 +92,7 @@ public class LocationServiceImpl implements LocationService {
         return buildLocationDto(savedLocation);
     }
 
+    @Transactional
     @Override
     public String deleteLocation(Long id) {
         locationRepository.deleteById(id);
