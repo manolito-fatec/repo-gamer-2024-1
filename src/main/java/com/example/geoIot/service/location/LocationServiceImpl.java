@@ -47,7 +47,7 @@ public class LocationServiceImpl implements LocationService {
             throw new NoSuchElementException("No locations exist yet");
         }
         return locationList.stream()
-                .map(this::buildLocationDto) // Use the new buildLocationDto method
+                .map(this::buildLocationDto)
                 .toList();
     }
 

@@ -1,7 +1,6 @@
 package com.example.geoIot.entity.dto;
 
 import lombok.*;
-import org.locationtech.jts.geom.Polygon;
 
 import java.util.List;
 
