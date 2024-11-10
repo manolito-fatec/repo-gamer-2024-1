@@ -42,12 +42,12 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public List<LocationDto> getAllLocations() {
-        List<Location> locationList = locationRepository.findAll();
+        List<Location> locationList = locationRepository.findAllByOrderByIdLocationDesc();
         if (locationList.isEmpty()) {
             throw new NoSuchElementException("No locations exist yet");
         }
         return locationList.stream()
-                .map(this::buildLocationDto) // Use the new buildLocationDto method
+                .map(this::buildLocationDto)
                 .toList();
     }
 
@@ -86,7 +86,7 @@ public class LocationServiceImpl implements LocationService {
         } else {
             throw new IllegalArgumentException("Formato de geometria invalido.");
         }
-
+        geometry.setSRID(4326);
         location.setGeom(geometry);
         Location savedLocation = locationRepository.save(location);
         return buildLocationDto(savedLocation);
