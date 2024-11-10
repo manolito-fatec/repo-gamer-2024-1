@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.Geometry;
 
 @Getter
 @Setter
@@ -22,6 +22,5 @@ public class Location {
     @Column(name = "name")
     private String name;
     @Column(name = "poly", columnDefinition = "SDO_GEOMETRY")
-    private Polygon polygon;
-
+    private Geometry geom;
 }
