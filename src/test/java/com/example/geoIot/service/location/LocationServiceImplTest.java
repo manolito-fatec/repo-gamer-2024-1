@@ -102,7 +102,7 @@ public class LocationServiceImplTest {
         locations.add(location1);
         locations.add(location2);
 
-        when(locationRepository.findAll()).thenReturn(locations);
+        when(locationRepository.findAllByOrderByIdLocationDesc()).thenReturn(locations);
 
         List<LocationDto> locationDtos = locationService.getAllLocations();
 
