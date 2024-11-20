@@ -6,7 +6,6 @@ import com.example.geoIot.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class SeedDataConfig implements CommandLineRunner {
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserService userService;
 
     @Override
@@ -23,7 +21,7 @@ public class SeedDataConfig implements CommandLineRunner {
             UserDto admin = UserDto
                     .builder()
                     .email("admin@admin.com")
-                    .password(passwordEncoder.encode("admin"))
+                    .password("admin")
                     .role("ADMIN")
                     .build();
 
