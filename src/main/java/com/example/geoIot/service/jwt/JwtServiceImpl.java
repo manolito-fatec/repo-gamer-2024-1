@@ -18,7 +18,7 @@ import java.util.function.Function;
 @Service
 public class JwtServiceImpl implements JwtService {
 
-    String jwtSecretKey = "manolitogeoiot2024";
+    Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     Long jwtExpirationMs = 3600000L; // 1h
 
@@ -62,7 +62,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(jwtSecretKey.getBytes(StandardCharsets.UTF_8));
+        return Keys.hmacShaKeyFor(key.getEncoded());
     }
 
     private String generateToken(Map<String, Object> claims, User user) {
