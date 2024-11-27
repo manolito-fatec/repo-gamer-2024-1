@@ -15,6 +15,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -53,6 +55,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         } catch (AuthenticationException e) {
             throw new IllegalArgumentException("Invalid credentials", e);
         }
+    }
+
+    @Override
+    public Boolean getUSerByEmail(String email) {
+        return email != null
+                && !email.isBlank()
+                && userRepository.findByUserEmail(email).isPresent();
     }
 
 }
