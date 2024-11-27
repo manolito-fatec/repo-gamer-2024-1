@@ -9,4 +9,6 @@ public interface AuthenticationService {
     JwtAuthenticationResponseDto signup(SignupRequestDto request);
 
     JwtAuthenticationResponseDto login(LoginRequestDto request);
+
+    Boolean getUSerByEmail(String email);
 }
